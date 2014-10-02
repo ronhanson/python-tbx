@@ -1,0 +1,6 @@
+v1.0.0, 2014-01-22 -- Initial release under another repo.
+v1.0.1, 2014-05-13 -- Created full repo for that toolbox.
+v1.0.2, 2014-05-15 -- Bugfixes, some function more, and scripts to build deb.
+v1.0.3, 2014-05-21 -- Bugfixes, on logs and other stuffs.
+v1.0.4, 2014-06-04 -- Process functions added + get ip script
+v1.0.5, 2014-06-13 -- FTP features, file lists, etc.

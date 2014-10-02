@@ -1,0 +1,5 @@
+lxml >= 3.2
+pysnmp >= 4.2.5
+configobj >= 4.7.0
+jinja2 >= 2.7.2
+pyftpdlib >= 1.3
