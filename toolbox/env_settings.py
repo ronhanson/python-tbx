@@ -18,7 +18,7 @@ environment = "development" #by default
 try:
     with open(os.path.join(script_folder, 'environment.txt'), 'r') as f:
         environment = f.readline().strip()
-except (ConfigObjError, IOError), e:
+except (ConfigObjError, IOError) as e:
     pass
     #print('Could not read environment from "environment.txt": %s' % e)
     #exit(1)
@@ -40,11 +40,11 @@ try:
     if not results:
         for (section_list, key, _) in flatten_errors(conf, results):
             if key is not None:
-                print 'The "%s" key in the section "%s" failed validation' % (key, ', '.join(section_list))
+                print("The '%s' key in the section '%s' failed validation" % (key, ', '.join(section_list)))
             else:
-                print 'The following section was missing:%s ' % ', '.join(section_list)
+                print("The following section was missing: %s " % ', '.join(section_list))
 
-except (ConfigObjError, IOError), e:
+except (ConfigObjError, IOError) as e:
     pass
     #print('Environment invalid. Could not read config from "%s": %s, %s' % (config_path, e, e.__dict__))
 

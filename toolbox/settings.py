@@ -54,7 +54,7 @@ def from_file(name="config", application_name=None, path_template="/etc/<app_nam
                     print('The following section was missing:%s ' % ', '.join(section_list))
             exit(1)
 
-    except (ConfigObjError, IOError), e:
+    except (ConfigObjError, IOError) as e:
         print('Could not read config from "%s": %s, %s' % (config_path, e, e.__dict__))
         exit(1)
 

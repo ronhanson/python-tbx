@@ -53,9 +53,9 @@ class SocketClient:
         try:
             self.sock.connect((self.host, self.port))
             return self.sock
-        except socket.error, ex:
+        except socket.error as ex:
             raise Exception('Unable to connect socket on %s:%s - Error %s' % (self.host, self.port, ex))
-        except Exception, ex:
+        except Exception as ex:
             raise Exception('Unable to connect socket on %s:%s - Error %s' % (self.host, self.port, ex))
 
 #    def send(self, data):

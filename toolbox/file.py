@@ -55,7 +55,7 @@ def full_file_list_with_sequence(scan_path):
                 if sc.sequence:
                     filelist.append(sc)
                     continue
-            except Exception, e:
+            except Exception as e:
                 pass
                 
             for _file in files:

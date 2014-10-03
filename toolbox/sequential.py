@@ -12,6 +12,7 @@ import os.path
 import glob
 from . import code as code_utils
 
+
 class SequentialCandidate(code_utils.SerializableObject):
     """
     It creates a SequentialCandidate object which provides these attributes:

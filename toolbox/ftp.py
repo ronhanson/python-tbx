@@ -11,6 +11,7 @@ import pyftpdlib.servers
 import pyftpdlib.handlers
 from . import text
 
+
 class FTPEventLogger:
 
     def log(self, msg, logfun=None, error=False):

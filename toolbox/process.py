@@ -161,7 +161,7 @@ def daemonize(umask=0, work_dir="/", max_fd=1024, redirect="/dev/null"):
 
     try:
         pid = os.fork()
-    except OSError, e:
+    except OSError as e:
         raise Exception("%s [%d]" % (e.strerror, e.errno))
 
     # first child
@@ -171,7 +171,7 @@ def daemonize(umask=0, work_dir="/", max_fd=1024, redirect="/dev/null"):
         try:
             # Fork a second child.
             pid = os.fork()
-        except OSError, e:
+        except OSError as e:
             raise Exception("%s [%d]" % (e.strerror, e.errno))
 
         # The second child.

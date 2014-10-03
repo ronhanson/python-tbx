@@ -108,7 +108,7 @@ def javascript_quote(s, quote_double_quotes=True):
     if type(s) == str:
         s = s.decode('utf-8')
     elif type(s) != unicode:
-        raise TypeError, s
+        raise TypeError(s)
     s = s.replace('\\', '\\\\')
     s = s.replace('\r', '\\r')
     s = s.replace('\n', '\\n')
