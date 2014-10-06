@@ -8,6 +8,7 @@ File Utils
 """
 
 import os
+import sys
 from . import sequential
 
 ZIP_EXTENSIONS = ['bz2', 'gz', 'xz', 'bz2', 'rar', 'gz', 'tar', 'tbz2', 'tgz', 'zip', 'Z', '7z', 'xz', 'ace']
@@ -31,7 +32,7 @@ def list_files(scan_path, contains=None):
     """
     filelist = []
     path = os.path.abspath(scan_path)
-    for file in os.listdir(path):
+    for file in sorted(os.listdir(path)):
         if contains and file.find(contains) < 0:
             continue
         filepath = os.path.join(path, file)
@@ -55,7 +56,7 @@ def full_file_list_with_sequence(scan_path):
                 if sc.sequence:
                     filelist.append(sc)
                     continue
-            except Exception as e:
+            except Exception, e:
                 pass
                 
             for _file in files:
