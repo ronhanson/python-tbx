@@ -18,7 +18,7 @@ import tempfile
 import re
 
 import logging
-import text as text_utils
+from . import text as text_utils
 
 def restart_program():
     """

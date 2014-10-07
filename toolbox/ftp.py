@@ -86,7 +86,7 @@ class DummyDictFTPAuthorizer(pyftpdlib.handlers.DummyAuthorizer):
         Constructor
         """
         super(DummyDictFTPAuthorizer, self).__init__()
-        for username, user in users.iteritems():
+        for username, user in users.items():
             self.add_user(username,
                           user['password'],
                           user['homedir'],

@@ -20,7 +20,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.utils import COMMASPACE, formatdate
-from email import Encoders
+from email import encoders
 
 
 def xml_get_tag(xml, tag, parent_tag = None, multi = False):
@@ -52,7 +52,7 @@ def convert_to_unicode(text_to_convert):
             else:
                 break
         text_to_convert = strtext
-        
+
     unitext = text_to_convert
     for encoding in ['utf-8', 'ascii', 'latin_1']:
         try:
@@ -79,9 +79,9 @@ def convert_foreign_chars(text):
     text = text.replace(u'Ø', 'O')
     text = text.replace(u'ü', 'u')
     text = text.replace(u'Ü', 'U')
-    
+
     text = text.replace(u'æ', 'ae')
-    
+
     text = text.replace(u'¬', '-')
     text = text.replace(u'£', '-')
 
@@ -92,7 +92,7 @@ def convert_foreign_chars(text):
     text = text.replace(u'@', '-')
     text = text.replace(u'[', '-')
     text = text.replace(u']', '-')
-    
+
     return text
 
 
@@ -138,7 +138,7 @@ def send_mail(send_from, send_to, subject, text, server, files=None):
         fp = open(f,"rb")
         fcontent = fp.read()
         part.set_payload( fcontent )
-        Encoders.encode_base64(part)
+        encoders.encode_base64(part)
         part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(f))
         msg.attach(part)
 

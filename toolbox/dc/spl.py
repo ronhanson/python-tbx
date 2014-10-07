@@ -9,11 +9,16 @@ from __future__ import (unicode_literals, absolute_import,
                         division, print_function)
 import os
 from lxml import etree
-from StringIO import StringIO
 from .cpl import CPL
 import uuid as UUID
 from .. import template
 from .. import text
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 
 class SPL(object):
     def __init__(self, uuid=None, title='Unknown', annotation=None, duration=0.0, content_version=None, cpls=None):
