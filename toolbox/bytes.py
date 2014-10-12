@@ -16,204 +16,92 @@ import socket
 import time
 import logging
 import re
-from struct import pack, unpack
+import struct
 from datetime import timedelta
-from array import array
+import six
+import uuid
+import binascii
+from . import network
 
 
-def int_2_ber(siz):
-    byte_length = word_2_byte_array(siz + 4)
-    return array('B', (0x83, byte_length[1], byte_length[2], byte_length[3]))
+def bytes_to_int(byte_array, bigendian=True):
 
-
-def ber_2_int(ber):
-    return byte_array_2_word('\x00' + ber[1:])
-
-
-def pack_word(word):
-    return pack('>I', word)
-
-
-def byte_array_2_word(byte_array):
-    """
-    Converts a 4 byte array (either as a string or an array) to a 32-bit unsigned int; assumes big-endian form
-
-    Test with misc. string byte arrays:
-        >>> byte_array_2_word('\\x00\\x00\\x00\\x01')
-        1
-        >>> byte_array_2_word('\\x00\\x00\\x01\\x01')
-        257
-        >>> byte_array_2_word('\\x00\\x01\\x01\\x01')
-        65793
-
-    Test with misc. array byte arrays:
-        >>> byte_array_2_word(array('B', (0, 0, 0, 1)))
-        1
-        >>> byte_array_2_word(array('B', (0, 0, 1, 1)))
-        257
-        >>> byte_array_2_word(array('B', (0, 1, 1, 1)))
-        65793
-
-    Test incorrect type error:
-        >>> byte_array_2_word(123)
-        Traceback (most recent call last):
-        ...
-        TypeError
-    """
-    if isinstance(byte_array, str):
-        return unpack('>I', pack('>BBBB', ord(byte_array[0]), ord(byte_array[1]), ord(byte_array[2]), ord(byte_array[3])))[0]
-    elif hasattr(byte_array, "__getitem__"): #isinstance(byte_array, (array, list, tuple)):
-        return unpack('>I', pack('>BBBB', byte_array[0], byte_array[1], byte_array[2], byte_array[3]))[0]
+    if six.PY3:
+        order = 'little'
+        if bigendian:
+            order = 'big'
+        return int.from_bytes(byte_array, byteorder=order)
     else:
-        raise TypeError
+        raise Exception("TODO PYTHON 2")
 
 
-def byte_array_2_little_endian_word(byte_array):
-    if isinstance(byte_array, str):
-        return unpack('<I', pack('<BBBB', ord(byte_array[0]), ord(byte_array[1]), ord(byte_array[2]), ord(byte_array[3])))[0]
-    elif hasattr(byte_array, "__getitem__"): #isinstance(byte_array, (array, list, tuple)):
-        return unpack('<I', pack('<BBBB', byte_array[0], byte_array[1], byte_array[2], byte_array[3]))[0]
+def bytes_to_uuid(byte_array):
+    return uuid.UUID(bytes=bytes(byte_array))
+
+
+def uuid_to_bytes(id):
+    return uuid.UUID(id).bytes
+
+
+def bytes_to_uuid_list(byte_array):
+    result = []
+    for i in range(0, len(byte_array)//16):
+        result.append(uuid.UUID(bytes=bytes(byte_array[i*16:i*16+16])))
+    return result
+
+
+def bytes_to_text(byte_array, encoding='UTF-8'):
+    return bytes(byte_array).decode(encoding)
+
+
+def bytes_to_hex(byte_array):
+    return binascii.hexlify(byte_array).decode('ascii')
+
+
+def int_to_bytes(val, size=4, signed=False, bigendian=True):
+    if size == 1:
+        code = 'B'
+    elif size == 2:
+        code = 'H'
+    elif size == 4:
+        code = 'I'
+    elif size == 8:
+        code = 'Q'
     else:
-        raise TypeError
+        raise Exception("int_to_bytes : size parameter value should be 1, 2, 4, or 8")
 
-
-def byte_array_2_short(byte_array):
-    if isinstance(byte_array, str):
-        return unpack('>h', pack('>BB', ord(byte_array[0]), ord(byte_array[1])))[0]
-    elif hasattr(byte_array, "__getitem__"): #isinstance(byte_array, (array, list, tuple)):
-        return unpack('>h', pack('>BB', byte_array[0], byte_array[1]))[0]
+    if bigendian:
+        code = '>'+code
     else:
-        raise TypeError
+        code = '<'+code
+
+    if signed or val < 0:
+        code = code.lower()
+
+    return struct.pack(code, val)
 
 
-def byte_array_2_long(byte_array):
-    if isinstance(byte_array, str):
-        return unpack('>Q', pack('>BBBBBBBB', ord(byte_array[0]), ord(byte_array[1]),
-            ord(byte_array[2]), ord(byte_array[3]) , ord(byte_array[4]),
-            ord(byte_array[5]), ord(byte_array[6]), ord(byte_array[7])))[0]
-    elif hasattr(byte_array, "__getitem__"):
-        return unpack('>Q', pack('>BBBBBBBB', byte_array[0], byte_array[1], byte_array[2],
-            byte_array[3], byte_array[4], byte_array[5], byte_array[6], byte_array[7]))[0]
+def ip_to_bytes(ip_str, bigendian=True):
+    """
+    Converts an IP given as a string to a byte sequence
+    """
+    if bigendian:
+        code = '>L'
     else:
-        raise TypeError
+        code = '<L'
+    return bytes(struct.unpack(code, socket.inet_aton(ip_str))[0])
 
 
-def byte_array_2_little_endian_long(byte_array):
-    if isinstance(byte_array, str):
-        return unpack('<Q', pack('<BBBBBBBB', ord(byte_array[0]), ord(byte_array[1]),
-            ord(byte_array[2]), ord(byte_array[3]) , ord(byte_array[4]), ord(byte_array[5]),
-            ord(byte_array[6]), ord(byte_array[7])))[0]
-    elif hasattr(byte_array, "__getitem__"):
-        return unpack('<Q', pack('<BBBBBBBB', byte_array[0], byte_array[1], byte_array[2],
-            byte_array[3], byte_array[4], byte_array[5], byte_array[6], byte_array[7]))[0]
+def ip_to_little_endian_word(ip_str, bigendian=False):
+    """
+    Converts an IP given as a string to a byte sequence
+    """
+    if bigendian:
+        code = '>L'
     else:
-        raise TypeError
+        code = '<L'
+    return bytes(struct.unpack(code, socket.inet_aton(ip_str))[0])
 
-
-def word_2_byte_array(word):
-    """
-    Converts a 32-bit int to a byte array in big-endian form
-
-    Test misc. 32-bit ints:
-        >>> word_2_byte_array(1)
-        (0, 0, 0, 1)
-        >>> word_2_byte_array(257)
-        (0, 0, 1, 1)
-        >>> word_2_byte_array(65793)
-        (0, 1, 1, 1)
-    """
-    return unpack('>BBBB', pack('>I', word))
-
-def long_2_byte_array(longLong):
-    """
-    Converts a 64-bit long to a byte array in big-endian form
-    """
-    return unpack('>BBBBBBBB', pack('>Q', longLong))
-
-def long_2_byte_array_little_endian(longLong):
-    """
-    Converts a 64-bit long to a byte array in big-endian form
-    """
-    return unpack('<BBBBBBBB', pack('<Q', longLong))
-
-def short_2_byte_array(short):
-    return unpack('>BB', pack('>H', short))
-
-def uuid_bytes_2_canonical(some_bytes):
-    """
-    Creates a canonical representation of a byte-represented UUID
-
-    Test a canonical UUID:
-        >>> uuid_bytes_2_canonical('\\xf8\\x1dO\\xae}\\xec\\x11\\xd0\\xa7e\\x00\\xa0\\xc9\\x1ek\\xf6')
-        'f81d4fae-7dec-11d0-a765-00a0c91e6bf6'
-    """
-    uuid = ''
-    for byte in some_bytes[:4]:
-        h = hex(ord(byte))[2:]
-        if len(h) == 1:
-            uuid += '0' + h
-        else:
-            uuid += h
-    uuid += '-'
-    for byte in some_bytes[4:6]:
-        h = hex(ord(byte))[2:]
-        if len(h) == 1:
-            uuid += '0' + h
-        else:
-            uuid += h
-    uuid += '-'
-    for byte in some_bytes[6:8]:
-        h = hex(ord(byte))[2:]
-        if len(h) == 1:
-            uuid += '0' + h
-        else:
-            uuid += h
-    uuid += '-'
-    for byte in some_bytes[8:10]:
-        h = hex(ord(byte))[2:]
-        if len(h) == 1:
-            uuid += '0' + h
-        else:
-            uuid += h
-    uuid += '-'
-    for byte in some_bytes[10:16]:
-        h = hex(ord(byte))[2:]
-        if len(h) == 1:
-            uuid += '0' + h
-        else:
-            uuid += h
-    return uuid
-
-
-def uuid_canonical_2_bytes(uuid_str):
-    """
-    Converts a UUID from its canonical form to an array of 16 bytes
-
-    Test a canonical to bytes (return in string form to compare to uuid_bytes_2_canonical test):
-        >>> uuid_canonical_2_bytes('f81d4fae-7dec-11d0-a765-00a0c91e6bf6').tostring()
-        '\\xf8\\x1dO\\xae}\\xec\\x11\\xd0\\xa7e\\x00\\xa0\\xc9\\x1ek\\xf6'
-    """
-    if uuid_str == None:
-        uuid_str = '00000000000000000000000000000000'
-    else:
-        uuid_str = uuid_str.replace('-', '')    # Strip all '-'s from the string
-    some_bytes = array('B')
-    for i in xrange(0, len(uuid_str), 2):
-        some_bytes.append(int(uuid_str[i:i + 2], 16))
-    return some_bytes
-
-def ip_to_little_endian_word(ip_str):
-    """
-    Converts a dotted quad notation IP address into
-    a word in little endian format
-
-    Returns - word
-
-    Test an IP address:
-        >>> ip_to_little_endian_word('192.168.10.50')
-        839559360
-    """
-    return unpack('<L', socket.inet_aton(ip_str))[0]
 
 def int_to_time(totalseconds):
     """
@@ -271,6 +159,7 @@ def date_string_to_utc(local_datetime_string):
     tuple = datetime_object.timetuple()
     return calendar.timegm(tuple)
 
+
 def get_time_from_string(timestring):
     """
     Get a time from a formatted date/time string
@@ -288,3 +177,95 @@ def get_time_from_string(timestring):
         return calendar.timegm(time.strptime(timestring + ' 00:00:00', '%Y-%m-%d %H:%M:%S'))
     else:
         return 0
+
+
+
+def convert_bytearray(func):
+    """
+    Decorator to convert the first parameter to a bytearray
+    """
+    def wrapped(ber, *args, **kwargs):
+        return func(bytearray(ber), *args, **kwargs)
+    return wrapped
+
+def return_bytearray(func):
+    """
+    Decorator to convert a function's returned value to a bytearray
+    """
+    def wrapped(*args, **kwargs):
+        return bytearray(func(*args, **kwargs))
+    return wrapped
+
+
+@convert_bytearray
+def decode_ber(ber):
+    """
+    Decodes an array of bytes to an integer value
+
+    If the first byte in the BER length field does not have the high bit set (0x80),
+    then that single byte represents an integer between 0 and 127 and indicates
+    the number of Value bytes that immediately follows. If the high bit is set,
+    then the lower seven bits indicate how many bytes follow that make up a length field
+    """
+    length = ber[0]
+    bytes_read = 1
+    if length > 127:
+        bytes_read += length & 127 # Strip off the high bit
+        length = 0
+        for i in range(1, bytes_read):
+            length += ber[i] << (8 * (bytes_read - i - 1))
+    return length, bytes_read
+
+
+def ber_from_socket(s):
+    """
+    Decodes an array of bytes to an integer value
+
+    If the first byte in the BER length field does not have the high bit set (0x80),
+    then that single byte represents an integer between 0 and 127 and indicates
+    the number of Value bytes that immediately follows. If the high bit is set,
+    then the lower seven bits indicate how many bytes follow that make up a length field
+    """
+    if isinstance(s, network.SocketClient):
+        recv = s.receive
+    else:
+        recv = s.recv
+    data = recv(1)
+
+    length = data[0]
+    bytes_read = 1
+    if length > 127:
+        bytes_read += length & 127 # Strip off the high bit
+        data += recv(bytes_read - 1)
+        length = 0
+        for i in range(1, bytes_read):
+            length += data[i] << (8 * (bytes_read - i - 1))
+    return length, bytes_read, data
+
+
+@return_bytearray
+def encode_ber(value, ber_length=0):
+    """
+    Encodes an integer to BER
+    The length of the encoded BER value (in bytes) can be optionally specified
+    """
+    if not ber_length:
+        if value < 127:
+            return [value]
+        elif value < 256:
+            ber_length = 2
+        elif value < 256 * 256:
+            ber_length = 3
+        elif value < 256 * 256 * 256:
+            ber_length = 4
+        else:
+            ber_length = 5 # 32 bit unsigned int is the max for this function
+    # Add the BER byte length
+    ber = [127 + ber_length]
+    for i in range(1, ber_length):
+        ber.append( (value >> (8 * (ber_length - i - 1))) & 255 )
+    return ber
+
+
+
+

@@ -6,8 +6,7 @@
 Text Utils
 :author: Ronan Delacroix
 """
-
-import cgi
+import html
 import json
 import datetime
 
@@ -15,6 +14,7 @@ import os
 import lxml.etree as etree
 import re
 import smtplib
+import six
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -43,7 +43,7 @@ def xml_get_tag(xml, tag, parent_tag = None, multi = False):
 
 
 def convert_to_unicode(text_to_convert):
-    if type(text_to_convert)==unicode:
+    if type(text_to_convert) == six.text_type:
         for encoding in ['latin_1', 'ascii', 'utf-8']:
             try:
                 strtext = text_to_convert.encode(encoding)
@@ -107,7 +107,7 @@ def javascript_quote(s, quote_double_quotes=True):
 
     if type(s) == str:
         s = s.decode('utf-8')
-    elif type(s) != unicode:
+    elif type(s) != six.text_type:
         raise TypeError(s)
     s = s.replace('\\', '\\\\')
     s = s.replace('\r', '\\r')
@@ -117,6 +117,7 @@ def javascript_quote(s, quote_double_quotes=True):
     if quote_double_quotes:
         s = s.replace('"', '&quot;')
     return str(ustring_re.sub(fix, s))
+
 
 def send_mail(send_from, send_to, subject, text, server, files=None):
     if files==None:
@@ -145,7 +146,8 @@ def send_mail(send_from, send_to, subject, text, server, files=None):
     smtp = smtplib.SMTP(server)
     smtp.sendmail(send_from, send_to, msg.as_string())
     smtp.close()
-        
+
+
 def format_money(money):
     split_float = str(money).split(".")
     money_out = ""
@@ -187,6 +189,7 @@ def hms_from_seconds( seconds ):
     secs = int(seconds % 60.0)
     return "{0:02d}:{1:02d}:{2:02d}".format(hours, minutes, secs)
 
+
 def str2bool(v):
     return str(v).lower() in ("yes", "on", "true", "y", "t", "1")
 
@@ -207,15 +210,28 @@ mime_rendering_dict = {
 }
 
 
+def pretty_render(data: dict, format='text', indent=0):
+    """
+    Render a dict based on a format
+    """
+    if format == 'json':
+        return render_json(data)
+    elif format == 'html':
+        return render_html(data)
+    elif format == 'xml':
+        return render_xml(data)
+    else:
+        return dict_to_plaintext(data, indent=indent)
+
 
 # DICT TO XML FUNCTION
 def _dict_to_xml_recurse(parent, dictitem):
     if isinstance(dictitem, list):
         dictitem = {'item' : dictitem}
     if isinstance(dictitem, dict):
-        for (tag, child) in dictitem.iteritems():
-            if unicode(tag) == '_text':
-                parent.text = unicode(child)
+        for (tag, child) in dictitem.items():
+            if str(tag) == '_text':
+                parent.text = str(child)
             elif type(child) is type([]):
                 # iterate through the array and convert
                 for listchild in child:
@@ -236,7 +252,7 @@ def _dict_to_xml_recurse(parent, dictitem):
                 parent.append(elem)
                 _dict_to_xml_recurse(elem, child)
     else:
-        parent.text = unicode(dictitem)
+        parent.text = str(dictitem)
 
 
 def dict_to_xml(xmldict):
@@ -264,25 +280,25 @@ def dict_to_plaintext(_dict, indent=0, result=''):
         for value in _dict:
             i+=1
             if isinstance(value, dict) :
-                result += '\t' * indent + "["+unicode(i)+"]={DICT}\n" + dict_to_plaintext(value, indent+1)
+                result += '\t' * indent + "["+str(i)+"]={DICT}\n" + dict_to_plaintext(value, indent+1)
             elif isinstance(value, list) :
-                result += '\t' * indent + "["+unicode(i)+"]=<LIST>\n" + dict_to_plaintext(value, indent+1) + "\n"
+                result += '\t' * indent + "["+str(i)+"]=<LIST>\n" + dict_to_plaintext(value, indent+1) + "\n"
             else:
-                result += '\t' * indent + "["+unicode(i)+"]=\"" + unicode(value) + "\"\n"
+                result += '\t' * indent + "["+str(i)+"]=\"" + str(value) + "\"\n"
         return result
     elif isinstance(_dict, dict):
-        for key, value in _dict.iteritems():
+        for key, value in _dict.items():
             if isinstance(value, dict):
-                result += '\t' * indent + "{" + unicode(key) + "}\n" + dict_to_plaintext(value, indent+1)
+                result += '\t' * indent + "{" + str(key) + "}\n" + dict_to_plaintext(value, indent+1)
             elif isinstance(value, list):
-                result += '\t' * indent + "<" + unicode(key) + '>\n' + dict_to_plaintext(value, indent+1)
+                result += '\t' * indent + "<" + str(key) + '>\n' + dict_to_plaintext(value, indent+1)
             else:
-                if "\n" in unicode(value):
-                    value = ' '.join([line.strip() for line in unicode(value).replace("\"", "'").split("\n")])
-                result += '\t' * indent + unicode(key) + '=' + "\"" + unicode(value) + "\"\n"
+                if "\n" in str(value):
+                    value = ' '.join([line.strip() for line in str(value).replace("\"", "'").split("\n")])
+                result += '\t' * indent + str(key) + '=' + "\"" + str(value) + "\"\n"
         return result
     else:
-        return "\"" + unicode(_dict) + "\""
+        return "\"" + str(_dict) + "\""
 
 
 
@@ -295,31 +311,31 @@ def _dict_to_html_recurse(_dict, indent=0, result=''):
         for value in _dict:
             i+=1
             if isinstance(value, dict) :
-                result += '    ' * (indent+1) + "<li class='row"+unicode(i%2)+"'>\n" + _dict_to_html_recurse(value, indent+2) + '    ' * (indent+1) + "</li>\n"
+                result += '    ' * (indent+1) + "<li class='row"+str(i%2)+"'>\n" + _dict_to_html_recurse(value, indent+2) + '    ' * (indent+1) + "</li>\n"
             elif isinstance(value, list) :
-                result += '    ' * (indent+1) + "<li class='row"+unicode(i%2)+"'>\n" + _dict_to_html_recurse(value, indent+2) + '    ' * (indent+1) + "</li>\n"
+                result += '    ' * (indent+1) + "<li class='row"+str(i%2)+"'>\n" + _dict_to_html_recurse(value, indent+2) + '    ' * (indent+1) + "</li>\n"
             else:
-                result += '    ' * (indent+1) + "<li class='row"+unicode(i%2)+"'><pre>" + cgi.escape(unicode(value)) + "</pre></li>\n"
+                result += '    ' * (indent+1) + "<li class='row"+str(i%2)+"'><pre>" + html.escape(str(value)) + "</pre></li>\n"
         result += '    ' * indent + "</ul>\n"
         return result
     elif isinstance(_dict, dict):
         result += '    ' * indent + "<table>\n"
         i=0
-        for key, value in _dict.iteritems():
+        for key, value in _dict.items():
             i+=1
             if isinstance(value, dict) or isinstance(value, list):
-                result += '    ' * (indent+1) + "<tr class='row"+unicode(i%2)+"'>\n"
-                result += '    ' * (indent+2) + "<td>" + unicode(key) + "</td>\n"
+                result += '    ' * (indent+1) + "<tr class='row"+str(i%2)+"'>\n"
+                result += '    ' * (indent+2) + "<td>" + str(key) + "</td>\n"
                 result += '    ' * (indent+2) + "<td>\n" + _dict_to_html_recurse(value, indent+3)
                 result += '    ' * (indent+2) + "</td>\n"
                 result += '    ' * (indent+1) + "</tr>\n"
             else:
-                value = cgi.escape(unicode(value))
-                result += '    ' * (indent+1) + "<tr class='row"+unicode(i%2)+"'><td>" + unicode(key) + "</td><td>" + "<pre>" + unicode(value) + "</pre></td></tr>\n"
+                value = html.escape(str(value))
+                result += '    ' * (indent+1) + "<tr class='row"+str(i%2)+"'><td>" + str(key) + "</td><td>" + "<pre>" + str(value) + "</pre></td></tr>\n"
         result += '    ' * indent + "</table>\n"
         return result
     else:
-        return "<pre>" + cgi.escape(unicode(_dict)) + "</pre>"
+        return "<pre>" + html.escape(str(_dict)) + "</pre>"
 
 
 def dict_to_html(_dict, title="Result"):
@@ -347,7 +363,7 @@ def test_page(title="Result"):
     docu = {}
     i=0
     for func_name, doc in docu.items():
-        result += "<tr class='row" + unicode(i) + "'><td>" + doc['friendly_name'] + "</td>"
+        result += "<tr class='row" + str(i) + "'><td>" + doc['friendly_name'] + "</td>"
         if 'parameters' in doc:
             result += "<td><form action='" + func_name + "' method='"+doc['method_type']+"' enctype='multipart/form-data'>"
             result += "<table width='100%'>"
@@ -355,16 +371,16 @@ def test_page(title="Result"):
                 result += "<tr><th colspan='2'>Required</th></tr>"
                 for param in doc['parameters']['required']:
                     if param == 'asset_file':
-                        result += "<tr><td>" + unicode(param) + "</td><td><input type='file' name='" + unicode(param) + "' value=''/></td><tr/>"
+                        result += "<tr><td>" + str(param) + "</td><td><input type='file' name='" + str(param) + "' value=''/></td><tr/>"
                     else:
-                        result += "<tr><td>" + unicode(param) + "</td><td><input type='text' name='" + unicode(param) + "' value=''/></td><tr/>"
+                        result += "<tr><td>" + str(param) + "</td><td><input type='text' name='" + str(param) + "' value=''/></td><tr/>"
 
             if 'optionnal' in doc['parameters']:
                 result += "<tr><th colspan='2'>Optionnal</th></tr>"
                 for param, value in doc['parameters']['optionnal'].items():
                     if value==None:
                         value=''
-                    result += "<tr><td>" + unicode(param) + "</td><td><input type='text' name='" + unicode(param) + "' value='" + unicode(value) + "'/></td><tr/>"
+                    result += "<tr><td>" + str(param) + "</td><td><input type='text' name='" + str(param) + "' value='" + str(value) + "'/></td><tr/>"
             result += "<tr><th colspan='2'><input type='submit'/></th></tr>"
             result += "</table>"
             result += "</form></td>"

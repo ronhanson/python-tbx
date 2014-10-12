@@ -10,7 +10,7 @@ Network Utils
 import socket
 
 
-MSGLEN = 1024
+PACKETSIZE = 4096
 
 
 def get_local_ip_address(target):
@@ -60,7 +60,7 @@ class SocketClient:
 
 #    def send(self, data):
 #        totalsent = 0
-#        while totalsent < MSGLEN:
+#        while totalsent < PACKETSIZE:
 #            sent = self.sock.send(data[totalsent:])
 #            if sent == 0:
 #                raise RuntimeError("socket connection broken")
@@ -78,7 +78,7 @@ class SocketClient:
         """
         Receive a known length of bytes from a socket
         """
-        result = ''
+        result = bytearray()
         data = 'x'
         while len(data) > 0:
             data = self.sock.recv(siz - len(result))

@@ -33,4 +33,4 @@ def snmp_get(oid, ip_address):
         if errorStatus:
             raise Exception(errorStatus.prettyPrint() + ' at ' +  errorIndex and varBinds[int(errorIndex)-1] or '?')
 
-    return varBinds[0][1]
+    return str(varBinds[0][1])
