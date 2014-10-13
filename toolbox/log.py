@@ -11,6 +11,15 @@ import logging.handlers
 from . import code
 
 
+def configure_logging_to_screen(debug=False):
+    level = 'INFO'
+    if debug:
+        level = 'DEBUG'
+    (script_folder, app_name) = code.get_app_name()
+    settings = {'LOGGING_LEVEL': level, 'LOGGING_METHODS': ['SCREEN'], 'SCREEN_FORMAT': '%(message)s'}
+    configure_logger(logging.getLogger(), app_name, settings=settings)
+
+
 def configure_logging(log_name, settings={}, application_name=None):
     configure_logger(logging.getLogger(), log_name, settings=settings, application_name=application_name)
 
@@ -42,10 +51,10 @@ def configure_logger(logger, log_name, settings={}, application_name=None):
         logger.handlers_added = True
 
 
-
 def add_screen_logging(logger, settings={}):
+    screen_format = settings.get('SCREEN_FORMAT', '%(levelname)s | %(message)s')
     write_to_screen_handler = logging.StreamHandler()
-    screen_formatter = logging.Formatter('%(levelname)s | %(message)s', '%Y-%m-%dT%H:%M:%S')
+    screen_formatter = logging.Formatter(screen_format, '%Y-%m-%dT%H:%M:%S')
     write_to_screen_handler.setFormatter(screen_formatter)
     logger.addHandler(write_to_screen_handler)
 
@@ -58,8 +67,9 @@ def add_syslog_logging(logger, settings={}):
             syslog_address = '/var/run/syslog'
         else:
             syslog_address = '/dev/log'
+    syslog_format = settings.get('SYSLOG_FORMAT', '[%(asctime)s] [%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)s - %(message)s')
     write_to_syslog_handler = logging.handlers.SysLogHandler(address=syslog_address)
-    syslog_formatter = logging.Formatter('[%(asctime)s] [%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)s - %(message)s', '%Y-%m-%dT%H:%M:%S')
+    syslog_formatter = logging.Formatter(syslog_format, '%Y-%m-%dT%H:%M:%S')
     write_to_syslog_handler.setFormatter(syslog_formatter)
     logger.addHandler(write_to_syslog_handler)
 
@@ -101,8 +111,9 @@ def add_file_logging(logger, log_name, application_name, settings={}):
             print("Impossible to log with FILE handler to %s either, abandoning file logging." % log_folder)
             return
 
+    file_format = settings.get('FILE_FORMAT', '[%(asctime)s] [%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)s - %(message)s')
     log_file = os.path.join(log_folder, log_name + ".txt")
     write_to_file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=10000000, backupCount=10)
-    file_formatter = logging.Formatter('[%(asctime)s] [%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)s - %(message)s', '%Y-%m-%dT%H:%M:%S')
+    file_formatter = logging.Formatter(file_format, '%Y-%m-%dT%H:%M:%S')
     write_to_file_handler.setFormatter(file_formatter)
     logger.addHandler(write_to_file_handler)

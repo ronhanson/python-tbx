@@ -21,10 +21,11 @@ def full_file_list(scan_path):
     filelist = []
     path = os.path.abspath(scan_path)
     for root, dirs, files in os.walk(path):
-        if len(files)!=0 and not '.svn' in root and not '.git' in root:
+        if len(files) != 0 and not '.svn' in root and not '.git' in root:
             for _file in files:
                 filelist.append(os.path.join(root, _file))
     return filelist
+
 
 def list_files(scan_path, contains=None):
     """

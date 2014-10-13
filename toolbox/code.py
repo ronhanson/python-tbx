@@ -264,10 +264,11 @@ def sort_dictionary_list(dict_list, sort_key):
     dict_list.sort(key=itemgetter(sort_key))
     return dict_list
 
+
 def get_app_name():
     mod = sys.modules.get('__main__', sys.modules[__name__])
     if '__file__' in dir(mod):
-        script_folder = sys.path[0] if sys.path[0] != '' else sys.path[1]
+        script_folder = os.path.dirname(os.path.abspath(mod.__file__))
         app_name = os.path.split(mod.__file__)[1].replace('.pyc', '').replace('.py', '')
     else:
         script_folder = sys.path[0] if sys.path[0] != '' else sys.path[1]
