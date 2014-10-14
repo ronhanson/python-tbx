@@ -18,28 +18,28 @@ def full_file_list(scan_path):
     """
     Returns a list of all files in a folder and its subfolders (only files).
     """
-    filelist = []
+    file_list = []
     path = os.path.abspath(scan_path)
     for root, dirs, files in os.walk(path):
         if len(files) != 0 and not '.svn' in root and not '.git' in root:
-            for _file in files:
-                filelist.append(os.path.join(root, _file))
-    return filelist
+            for f in files:
+                file_list.append(os.path.join(root, f))
+    return file_list
 
 
 def list_files(scan_path, contains=None):
     """
     Returns a list of all files in a folder, without subfolders (only files).
     """
-    filelist = []
+    file_list = []
     path = os.path.abspath(scan_path)
-    for file in sorted(os.listdir(path)):
-        if contains and file.find(contains) < 0:
+    for f in sorted(os.listdir(path)):
+        if contains and f.find(contains) < 0:
             continue
-        filepath = os.path.join(path, file)
+        filepath = os.path.join(path, f)
         if os.path.isfile(filepath):
-            filelist.append(filepath)
-    return filelist
+            file_list.append(filepath)
+    return file_list
 
 
 def full_file_list_with_sequence(scan_path):
@@ -47,22 +47,22 @@ def full_file_list_with_sequence(scan_path):
     Returns a list of all files in a folder and its subfolders (only files).
     """
     
-    filelist = []
+    file_list = []
     path = os.path.abspath(scan_path)
     
     for root, dirs, files in os.walk(path):
-        if len(files)!=0 and not '.svn' in root and not '.git' in root:
+        if len(files) != 0 and not '.svn' in root and not '.git' in root:
             try:
                 sc = sequential.SequentialFolder(str(root))
                 if sc.sequence:
-                    filelist.append(sc)
+                    file_list.append(sc)
                     continue
             except Exception as e:
                 pass
                 
-            for _file in files:
-                filelist.append(os.path.join(root, _file))
-    return filelist
+            for f in files:
+                file_list.append(os.path.join(root, f))
+    return file_list
 
 
 def readlinkabs(l):
@@ -83,7 +83,7 @@ def unzip(filepath, output_path):
     """
     filename = os.path.split(filepath)[1]
     (name, extension) = os.path.splitext(filename)
-    extension=extension[1:].lower()
+    extension = extension[1:].lower()
     extension2 = os.path.splitext(name)[1][1:].lower()
 
     if extension not in ZIP_EXTENSIONS:
@@ -91,53 +91,53 @@ def unzip(filepath, output_path):
 
     extract_command = "unzip"
     output_args = "-d"
-    if extension=='bz2' and extension2=='tar':
+    if extension == 'bz2' and extension2 == 'tar':
         extract_command = "tar -xjf"
         output_args = "-C"
-    elif extension=='gz' and extension2=='tar':
+    elif extension == 'gz' and extension2 == 'tar':
         extract_command = "tar -xzf"
         output_args = "-C"
-    elif extension=='xz' and extension2=='tar':
+    elif extension == 'xz' and extension2 == 'tar':
         extract_command = "tar -xJf"
         output_args = "-C"
-    elif extension=='bz2':
+    elif extension == 'bz2':
         extract_command = "bunzip2 -dc "
         output_args = ">"
         output_path = os.path.join(output_path, name)
-    elif extension=='rar':
+    elif extension == 'rar':
         extract_command = "unrar x"
         output_args = ""
-    elif extension=='gz':
+    elif extension == 'gz':
         extract_command = "gunzip"
         output_args = ""
-    elif extension=='tar':
+    elif extension == 'tar':
         extract_command = "tar -xf"
         output_args = "-C"
-    elif extension=='tbz2':
+    elif extension == 'tbz2':
         extract_command = "tar -xjf"
         output_args = "-C"
-    elif extension=='tgz':
+    elif extension == 'tgz':
         extract_command = "tar -xzf"
         output_args = "-C"
-    elif extension=='zip':
+    elif extension == 'zip':
         extract_command = "unzip"
         output_args = "-d"
-    elif extension=='Z':
+    elif extension == 'Z':
         extract_command = "uncompress"
         output_args = ""
-    elif extension=='7z':
+    elif extension == '7z':
         extract_command = "7z x"
         output_args = ""
-    elif extension=='xz':
+    elif extension == 'xz':
         extract_command = "unxz"
         output_args = ""
-    elif extension=='ace':
+    elif extension == 'ace':
         extract_command = "unace"
         output_args = ""
-    elif extension=='iso':
+    elif extension == 'iso':
         extract_command = "7z x"
         output_args = ""
-    elif extension=='arj':
+    elif extension == 'arj':
         extract_command = "7z x"
         output_args = ""
 

@@ -27,7 +27,25 @@ def bytes_to_int(byte_array, big_endian=True, signed=False):
             order = 'big'
         return int.from_bytes(byte_array, byteorder=order, signed=signed)
     else:
-        raise Exception("TODO PYTHON 2")
+        length = len(byte_array)
+        if length == 1:
+            code = 'B'
+        elif length == 2:
+            code = 'H'
+        elif length == 4:
+            code = 'L'
+        elif length == 8:
+            code = 'Q'
+        else:
+            raise Exception("bytes_to_int : length of byte_array should be 1, 2, 4, or 8")
+        if big_endian:
+            code = '>'+code
+        else:
+            code = '<'+code
+
+        if signed:
+            code = code.lower()
+        return struct.unpack(code, byte_array)[0]
 
 
 def bytes_to_uuid(byte_array):
@@ -198,7 +216,7 @@ def ber_from_socket(s):
     return length, bytes_read, data
 
 
-def encode_ber(value: int, ber_length=0):
+def encode_ber(value, ber_length=0):
     """
     Encodes an integer to ber length
     You can set the ber_length manually.

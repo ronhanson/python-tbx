@@ -14,6 +14,9 @@ from . import text
 
 class FTPEventLogger:
 
+    def __init__(self):
+        pass
+
     def log(self, msg, logfun=None, error=False):
         raise Exception('Sub classes should override this function.')
 
@@ -96,6 +99,7 @@ class DummyDictFTPAuthorizer(pyftpdlib.handlers.DummyAuthorizer):
             )
         self.users = users
 
+
 class FTPLogger:
     """
     Dummy class to encapsulate pyftpdlib logging.
@@ -119,7 +123,8 @@ class FTPLogger:
         """
         self.log(msg)
 
-def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5700', name="Virtual FTP Server", masquerade_ip=None, max_connection=500, max_connection_per_ip=10):
+
+def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5700', name="Ronan Python FTP Server", masquerade_ip=None, max_connection=500, max_connection_per_ip=10):
     """
     Runs the FTP Server
     """
@@ -135,7 +140,7 @@ def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5
 
     handler.authorizer = DummyDictFTPAuthorizer(users=users)
 
-    handler.banner = "Ronan Python FTP Server. (Advice : Please use UTF-8 encoding and always use Binary mode)"
+    handler.banner = "%s. (Advice : Please use UTF-8 encoding and always use Binary mode)" % name
     handler.passive_ports = data_port_range
 
     if masquerade_ip:
@@ -144,10 +149,10 @@ def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5
     # Instantiate FTP server class and listen to 0.0.0.0:21 or whatever is written in the config
     address = (listen_to, port)
     server = pyftpdlib.servers.FTPServer(address, handler)
-    #if not isinstance(pyftpdlib.ftpserver.log, FTPLogger):
-    #    pyftpdlib.ftpserver.log = FTPLogger(name)
-    #    pyftpdlib.ftpserver.logline = FTPLogger(name)
-    #    pyftpdlib.ftpserver.logerror = FTPLogger(name + " ERROR")
+    if not isinstance(pyftpdlib.ftpserver.log, FTPLogger):
+        pyftpdlib.ftpserver.log = FTPLogger(name)
+        pyftpdlib.ftpserver.logline = FTPLogger(name)
+        pyftpdlib.ftpserver.logerror = FTPLogger(name + " ERROR")
 
     # set a limit for connections
     server.max_cons = max_connection

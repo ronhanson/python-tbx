@@ -14,6 +14,7 @@ from operator import itemgetter
 
 __singleton_instances = {}
 
+
 def static_singleton(*args, **kwargs):
     """
     STATIC Singleton Design Pattern Decorator
@@ -72,12 +73,14 @@ class AttributeDict(dict):
     def __setattr__(self, attr, value):
         self[attr] = value
 
-class MyException(Exception):
+
+class ProcessException(Exception):
     """
-       My Exception class
+       Process Exception class.
+       Displays the PID of the process in its representation.
     """
     def __init__(self, message):
-        super(MyException, self).__init__(message)
+        super(ProcessException, self).__init__(message)
 
     def __str__(self):
         return self.__repr__()
@@ -86,7 +89,8 @@ class MyException(Exception):
         return self.__repr__()
 
     def __repr__(self):
-        return "%s - Process ID : %s" % (super(MyException, self).__str__(), os.getpid())
+        return "%s - Process ID : %s" % (super(ProcessException, self).__str__(), os.getpid())
+
 
 def get_method_documentation(method):
     """
@@ -118,29 +122,29 @@ def get_method_documentation(method):
     """
     from inspect import getargspec
     result = {
-        'name' : method.__name__, 
-        'friendly_name' : ' '.join([ name.capitalize() for name in method.__name__.split('_')]),
+        'name': method.__name__,
+        'friendly_name': ' '.join([name.capitalize() for name in method.__name__.split('_')]),
     }
-    argspecs = getargspec(method)
+    arg_specs = getargspec(method)
     arguments = {}
 
-    if argspecs.defaults == None:
-        if len(argspecs.args[1:])>0:
-            arguments['required'] = list(argspecs.args[1:])
+    if not arg_specs.defaults:
+        if len(arg_specs.args[1:]) > 0:
+            arguments['required'] = list(arg_specs.args[1:])
     else:
-        if len(argspecs.args[1:-(len(argspecs.defaults))]):
-            arguments['required'] = list(argspecs.args[1:-(len(argspecs.defaults))])
-        arguments['optionnal'] = {}
-        for i in range(len(argspecs.defaults)):
-            arguments['optionnal'][ argspecs.args[-(len(argspecs.defaults)) + i ] ] = argspecs.defaults[i]
-    if arguments!={}:
+        if len(arg_specs.args[1:-(len(arg_specs.defaults))]):
+            arguments['required'] = list(arg_specs.args[1:-(len(arg_specs.defaults))])
+        arguments['optional'] = {}
+        for i in range(len(arg_specs.defaults)):
+            arguments['optional'][arg_specs.args[-(len(arg_specs.defaults)) + i]] = arg_specs.defaults[i]
+    if arguments != {}:
         result['parameters'] = arguments
 
     doc = method.__doc__.strip() if method.__doc__ else ''
     if ':' in method.__doc__:
-        doc = {'summary' : method.__doc__[0:doc.find('  :')].strip()}
+        doc = {'summary': method.__doc__[0:doc.find('  :')].strip()}
         params = re.findall(r":param ([^\s]*): (.*)\n", method.__doc__)
-        if len(params)>0:
+        if len(params) > 0:
             doc['parameters'] = {}
             for param in params:
                 doc['parameters'][param[0]] = param[1].strip()
@@ -149,9 +153,10 @@ def get_method_documentation(method):
         returns = regex.search(method.__doc__)
         if returns and returns.group(0):
             doc['return'] = returns.group(0).replace(':returns:', '').replace('\n        ', '\n').strip()
-    if doc!='':
+    if doc != '':
         result['help'] = doc
     return result
+
 
 def get_subclasses(klass):
     klasses = klass.__subclasses__()
@@ -159,29 +164,28 @@ def get_subclasses(klass):
     return list(set(klasses))
 
 
-
 class SerializableObject(object):
     """
-        Serializable object : allow to export an object as a dict or to fill an object from a dict
+    Serializable object : allow to export an object as a dict or to fill an object from a dict
     """
     def fill(self, _dict, class_list=None):
         for (key, value) in _dict.items():
             if type(value) in [list, dict, set]:
-                value = self.recursive_object_check( value, class_list)
+                value = self.recursive_object_check(value, class_list)
             if key != '_id':
                 self.__setattr__(key, value)
         return self
 
     def recursive_object_check(self, elem, class_list):
         if isinstance(elem, list):
-            i=0
+            i = 0
             while i < len(elem):
                 if type(elem[i]) in [list, dict, set]:
                     elem[i] = self.recursive_object_check(elem[i], class_list)
-                i+=1
+                i += 1
             return elem
         elif isinstance(elem, dict):
-            if class_list!=None and 'type' in elem and 'uuid' in elem and elem['type'] in [_class.__name__ for _class in class_list]:
+            if class_list and 'type' in elem and 'uuid' in elem and elem['type'] in [_class.__name__ for _class in class_list]:
                 for _class in class_list:
                     if elem['type'] == _class.__name__:
                         obj = _class().fill(elem, class_list=class_list)
@@ -194,7 +198,7 @@ class SerializableObject(object):
         return elem
 
     def to_dict(self, dic=None):
-        if not dic and dic!={}:
+        if not dic and dic != {}:
             dic = self.__dict__.copy() # we copy the __dict__ otherwise all the values objects, even strings, will be still referencing "self" ones. That means changing a value in the dict will change value of object, we dont want that.
         for (key, value) in dic.items():
 
@@ -214,7 +218,7 @@ class SerializableObject(object):
         return dic
 
     def __str__(self):
-        return self.__class__.__name__ + "   " +str(self.to_dict())
+        return self.__class__.__name__ + "   " + str(self.to_dict())
 
     def __iter__(self):
         return iter([self])
@@ -223,7 +227,7 @@ class SerializableObject(object):
         """
         Returns public information of the object
         """
-        if dic==None and dic!={}:
+        if dic is None and dic != {}:
             dic = self.to_dict()
         output = {}
         for (key, value) in dic.items():
@@ -248,12 +252,10 @@ class SerializableObject(object):
 
 def sort_dictionary_list(dict_list, sort_key):
     """
-    sorts a list of dictionarys based on the value of the
-    'sort_key'
+    sorts a list of dictionaries based on the value of the sort_key
 
-    someList - a list of dictionarys
-    sort_key - a string that  identifies the common key in
-               the dictionarys, to sort on.
+    dict_list - a list of dictionaries
+    sort_key - a string that  identifies the key to sort the dictionaries with.
 
     Test sorting a list of dictionaries:
         >>> sort_dictionary_list([{'b' : 1, 'value' : 2}, {'c' : 2, 'value' : 3}, {'a' : 3, 'value' : 1}], 'value')

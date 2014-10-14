@@ -5,6 +5,9 @@
 (c) 2013 - Ronan Delacroix
 Environment-Based Settings
 :author: Ronan Delacroix
+
+# WARNING : THIS MODULE IS ACTUALLY DEPRECATED AND ABANDONNED...
+
 """
 import os
 import sys

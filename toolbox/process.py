@@ -20,6 +20,7 @@ import re
 import logging
 from . import text as text_utils
 
+
 def restart_program():
     """
     Restarts the current program.
@@ -29,6 +30,7 @@ def restart_program():
     logging.debug("Restarting program...")
     python = sys.executable
     os.execl(python, python, * sys.argv)
+
 
 def synchronized(lock):
     """
@@ -67,7 +69,7 @@ def synchronized_limit(lock):
     return wrap
 
 
-def execute(command, return_output=True, logfile=None, log_settings=None, error_logfile=None, timeout=None, line_function=None, poll_timing = 0.01, logger=None, working_folder=None, env=None):
+def execute(command, return_output=True, log_file=None, log_settings=None, error_logfile=None, timeout=None, line_function=None, poll_timing = 0.01, logger=None, working_folder=None, env=None):
     """
         Execute a program and logs standard output into a file.
 
@@ -86,32 +88,32 @@ def execute(command, return_output=True, logfile=None, log_settings=None, error_
     else:
         log_folder = tempfile.mkdtemp()
 
-    if logfile == None:
-        logfile = os.path.join(log_folder, "commands", "execute-command-logfile-%s.log" % UUID.uuid4() )
+    if not log_file:
+        log_file = os.path.join(log_folder, "commands", "execute-command-logfile-%s.log" % UUID.uuid4())
         try:
             if not os.path.isdir(os.path.join(log_folder, "commands")):
                 os.makedirs(os.path.join(log_folder, "commands"))
         except:
             pass
-    if logger == None:
+    if not logger:
         logger = logging.getLogger('command_execute')
 
-    logfile_writer = open(logfile, 'a')
-    header = u"%s - Executing command (timeout=%s) :\n\t%s\n\n\n" % (datetime.now().isoformat(), timeout, text_utils.convert_to_unicode(command) )
-    logfile_writer.write( header.encode('utf-8') )
+    logfile_writer = open(log_file, 'a')
+    header = "%s - Executing command (timeout=%s) :\n\t%s\n\n\n" % (datetime.now().isoformat(), timeout, command)
+    logfile_writer.write(header)
     logfile_writer.flush()
 
-    logfile_reader = open(logfile, 'r')
+    logfile_reader = open(log_file, 'r')
     logfile_reader.seek(0, os.SEEK_END)
     logfile_start_position = logfile_reader.tell()
 
-    if error_logfile != None:
+    if error_logfile:
         err_logfile_writer = open(error_logfile, 'a')
     else:
         err_logfile_writer = logfile_writer
 
     start = datetime.now()
-    logger.info(u"\n\nExecuting command (timeout=%s) :\n\t%s\n" % (timeout, text_utils.convert_to_unicode(command)) )
+    logger.info(u"\n\nExecuting command (timeout=%s) :\n\t%s\n" % (timeout, command) )
 
     # We use "exec <command>" as Popen launches a shell, that runs the command.
     # It will transform the child process "sh" into the "command exectable" because of the "exec".
@@ -134,13 +136,13 @@ def execute(command, return_output=True, logfile=None, log_settings=None, error_
 
         # Line function call:
         #   => if line_function is defined, we call it on each new line of the file.
-        if line_function != None:
+        if line_function:
             o = logfile_reader.readline().rstrip()
             while o != '':
                 line_function(o)
                 o = logfile_reader.readline().rstrip()
 
-    if return_output == False:
+    if not return_output:
         # Return result code and ensure we have waited for the end of sub process
         return process.wait()
 
@@ -150,7 +152,8 @@ def execute(command, return_output=True, logfile=None, log_settings=None, error_
 
 def daemonize(umask=0, work_dir="/", max_fd=1024, redirect="/dev/null"):
     """
-    When this function is called, the process is daemonized (by forking + killing its parent). It becomes a background task.
+    When this function is called, the process is daemonized (by forking + killing its parent).
+    It becomes a background task.
     It is useful to release the console.
     """
     if not redirect:
@@ -184,7 +187,6 @@ def daemonize(umask=0, work_dir="/", max_fd=1024, redirect="/dev/null"):
     else:
         # Exit parent
         os._exit(0)
-
 
     #killing inherited file descriptors
     import resource

@@ -10,23 +10,23 @@ Network Utils
 import socket
 
 
-PACKETSIZE = 4096
+PACKET_SIZE = 4096
 
 
 def get_local_ip_address(target):
     """
     Get the local ip address to access one specific target.
     """
-    ipaddr = ''
+    ip_adr = ''
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect((target, 8000))
-        ipaddr = s.getsockname()[0]
+        ip_adr = s.getsockname()[0]
         s.close()
     except:
         pass
 
-    return ipaddr
+    return ip_adr
 
 
 class SocketClient:
@@ -58,21 +58,30 @@ class SocketClient:
         except Exception as ex:
             raise Exception('Unable to connect socket on %s:%s - Error %s' % (self.host, self.port, ex))
 
-#    def send(self, data):
-#        totalsent = 0
-#        while totalsent < PACKETSIZE:
-#            sent = self.sock.send(data[totalsent:])
-#            if sent == 0:
-#                raise RuntimeError("socket connection broken")
-#            totalsent = totalsent + sent
-#        return totalsent
+    def send_by_packet(self, data):
+        """
+        Send data by packet on socket
+        """
+        total_sent = 0
+        while total_sent < PACKET_SIZE:
+            sent = self.sock.send(data[total_sent:])
+            if sent == 0:
+                raise RuntimeError("socket connection broken")
+            total_sent += sent
+        return total_sent
+
+    def send_all(self, data):
+        """
+        Send all data on socket
+        """
+        sent = self.sock.sendall(data)
+        return sent
 
     def send(self, data):
         """
         Send data on socket
         """
-        sent = self.sock.sendall(data)
-        return sent
+        return self.sendall(data)
 
     def receive(self, siz):
         """
@@ -91,5 +100,5 @@ class SocketClient:
 
     def close(self):
         self.sock.close()
-        self.sock=None
+        self.sock = None
 

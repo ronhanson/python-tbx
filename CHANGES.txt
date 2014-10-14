@@ -7,3 +7,4 @@ v1.0.5, 2014-06-13 -- FTP features, file lists, etc.
 v1.1.0, 2014-10-12 -- Python 3 compat + Lazy Loading modules + reviewed bytes + misc changes
 v1.1.1, 2014-10-13 -- More work on bytes manipulations, etc.
 v1.1.2, 2014-10-14 -- Changes to bytes
+v1.2.0, 2014-10-14 -- Python 2 and 3 compat. Changed definitions, rewordings. Cleaning. PEP8. Refactoring.
