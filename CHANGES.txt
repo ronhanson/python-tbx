@@ -9,3 +9,4 @@ v1.1.1, 2014-10-13 -- More work on bytes manipulations, etc.
 v1.1.2, 2014-10-14 -- Changes to bytes
 v1.2.0, 2014-10-14 -- Python 2 and 3 compat. Changed definitions, rewordings. Cleaning. PEP8. Refactoring.
 v1.2.1, 2014-10-15 -- Removed DC related stuff (moved to dcitools).
+v1.2.2, 2014-10-15 -- FTP logging reviewed.

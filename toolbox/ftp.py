@@ -100,30 +100,6 @@ class DummyDictFTPAuthorizer(pyftpdlib.handlers.DummyAuthorizer):
         self.users = users
 
 
-class FTPLogger:
-    """
-    Dummy class to encapsulate pyftpdlib logging.
-    """
-
-    def __init__(self, name):
-        """
-        Constructor
-        """
-        self.name = name
-
-    def log(self, msg):
-        """
-        Log a message using the default logging handler.
-        """
-        logging.info("[%s] %s" % (self.name, msg) )
-
-    def __call__(self, msg):
-        """
-        Calling the object will result in logging using the default logging handler.
-        """
-        self.log(msg)
-
-
 def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5700', name="Ronan Python FTP Server", masquerade_ip=None, max_connection=500, max_connection_per_ip=10):
     """
     Runs the FTP Server
@@ -146,13 +122,12 @@ def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5
     if masquerade_ip:
         handler.masquerade_address = masquerade_ip
 
+    logging.getLogger('pyftpdlib').disabled = True
+    pyftpdlib.log.logger = logging.getLogger() # Replace pyftpd logger by default logger
+
     # Instantiate FTP server class and listen to 0.0.0.0:21 or whatever is written in the config
     address = (listen_to, port)
     server = pyftpdlib.servers.FTPServer(address, handler)
-    if not isinstance(pyftpdlib.ftpserver.log, FTPLogger):
-        pyftpdlib.ftpserver.log = FTPLogger(name)
-        pyftpdlib.ftpserver.logline = FTPLogger(name)
-        pyftpdlib.ftpserver.logerror = FTPLogger(name + " ERROR")
 
     # set a limit for connections
     server.max_cons = max_connection
