@@ -6,6 +6,7 @@
 FTP utils
 :author: Ronan Delacroix
 """
+import ftplib
 import logging
 import pyftpdlib.servers
 import pyftpdlib.handlers
@@ -158,3 +159,26 @@ def create_secure_ftp_server(users, certificate, listen_to="", port=990, data_po
     return create_server(handler, users, listen_to=listen_to, port=port, data_port_range=data_port_range,
                          name=name, masquerade_ip=masquerade_ip, max_connection=max_connection,
                          max_connection_per_ip=max_connection_per_ip)
+
+
+"""
+Following is only for client FTP using FTPUtil library.
+"""
+
+
+class FTPSession(ftplib.FTP):
+    """
+    This class is required to connect to a different port with FTPUtil lib.
+    """
+    def __init__(self, url, user, password, port=21):
+        ftplib.FTP.__init__(self)
+        self.connect(url, port)
+        self.login(user, password)
+
+    """
+    Usage :
+        import ftputil
+        with ftputil.FTPHost('my.server.url.or.ip', user='root', password='hello', 2121, session_factory=FTPSession) as host:
+            names = host.listdir(host.curdir)
+            print(names)
+    """

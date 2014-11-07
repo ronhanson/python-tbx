@@ -146,7 +146,7 @@ def str_to_bool(v):
     return str(v).lower() in ("yes", "on", "true", "y", "t", "1")
 
 
-datetime_handler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime) else None
+datetime_handler = lambda obj: obj.isoformat(sep=' ') if isinstance(obj, datetime.datetime) else None
 
 render_xml = lambda _dict: dict_to_xml_string("xml", _dict)
 render_json = lambda _dict: json.dumps(_dict, sort_keys=False, indent=4, default=datetime_handler)

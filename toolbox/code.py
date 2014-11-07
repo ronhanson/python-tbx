@@ -8,6 +8,7 @@ Code Utils
 """
 
 import sys
+import importlib
 import os
 import re
 from operator import itemgetter
@@ -277,3 +278,39 @@ def get_app_name():
         app_name = os.path.split(script_folder)[1].replace('.pyc', '').replace('.py', '')
     return script_folder, app_name
 
+
+def lazy_load_module(name):
+    """
+    Lazy load module function.
+    Use:
+        lazy_load_module(__name__)
+    in a __init__.py package file containing sub modules.
+
+    This allows to import the base module, but access those easily without importing each.
+    """
+    sys.modules[name] = LazyLoader(name)
+    return
+
+
+class LazyLoader:
+    """
+    Module Wrapper Class
+    See here for wrapping module class : http://stackoverflow.com/questions/2447353/getattr-on-a-module
+    Also does lazy loading of sub modules.
+    """
+    def __init__(self, name):
+        self.__module_name = name
+        self.__wrapped_module = sys.modules[self.__module_name]
+        self.__submodule_imports = {}
+
+    def __getattr__(self, name):
+        """
+        Lazy loading module
+        """
+        if name.startswith('__'): #importing needs access to some private reserved __*__ functions...
+            return getattr(self.__wrapped_module, name)
+
+        if not self.__submodule_imports.get(name, None):
+            self.__submodule_imports[name] = importlib.import_module('.'+name, package=self.__module_name)
+
+        return self.__submodule_imports.get(name, None)
