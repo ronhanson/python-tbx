@@ -70,7 +70,7 @@ class SocketClient:
             total_sent += sent
         return total_sent
 
-    def send_all(self, data):
+    def sendall(self, data):
         """
         Send all data on socket
         """
