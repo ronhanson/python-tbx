@@ -6,6 +6,7 @@
 FTP utils
 :author: Ronan Delacroix
 """
+import ftplib
 import logging
 import pyftpdlib.servers
 import pyftpdlib.handlers
@@ -100,30 +101,6 @@ class DummyDictFTPAuthorizer(pyftpdlib.handlers.DummyAuthorizer):
         self.users = users
 
 
-class FTPLogger:
-    """
-    Dummy class to encapsulate pyftpdlib logging.
-    """
-
-    def __init__(self, name):
-        """
-        Constructor
-        """
-        self.name = name
-
-    def log(self, msg):
-        """
-        Log a message using the default logging handler.
-        """
-        logging.info("[%s] %s" % (self.name, msg) )
-
-    def __call__(self, msg):
-        """
-        Calling the object will result in logging using the default logging handler.
-        """
-        self.log(msg)
-
-
 def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5700', name="Ronan Python FTP Server", masquerade_ip=None, max_connection=500, max_connection_per_ip=10):
     """
     Runs the FTP Server
@@ -146,13 +123,12 @@ def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5
     if masquerade_ip:
         handler.masquerade_address = masquerade_ip
 
+    logging.getLogger('pyftpdlib').disabled = True
+    pyftpdlib.log.logger = logging.getLogger() # Replace pyftpd logger by default logger
+
     # Instantiate FTP server class and listen to 0.0.0.0:21 or whatever is written in the config
     address = (listen_to, port)
     server = pyftpdlib.servers.FTPServer(address, handler)
-    if not isinstance(pyftpdlib.ftpserver.log, FTPLogger):
-        pyftpdlib.ftpserver.log = FTPLogger(name)
-        pyftpdlib.ftpserver.logline = FTPLogger(name)
-        pyftpdlib.ftpserver.logerror = FTPLogger(name + " ERROR")
 
     # set a limit for connections
     server.max_cons = max_connection
@@ -183,3 +159,26 @@ def create_secure_ftp_server(users, certificate, listen_to="", port=990, data_po
     return create_server(handler, users, listen_to=listen_to, port=port, data_port_range=data_port_range,
                          name=name, masquerade_ip=masquerade_ip, max_connection=max_connection,
                          max_connection_per_ip=max_connection_per_ip)
+
+
+"""
+Following is only for client FTP using FTPUtil library.
+"""
+
+
+class FTPSession(ftplib.FTP):
+    """
+    This class is required to connect to a different port with FTPUtil lib.
+    """
+    def __init__(self, url, user, password, port=21):
+        ftplib.FTP.__init__(self)
+        self.connect(url, port)
+        self.login(user, password)
+
+    """
+    Usage :
+        import ftputil
+        with ftputil.FTPHost('my.server.url.or.ip', user='root', password='hello', 2121, session_factory=FTPSession) as host:
+            names = host.listdir(host.curdir)
+            print(names)
+    """
