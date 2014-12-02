@@ -10,10 +10,6 @@ v1.1.2, 2014-10-14 -- Changes to bytes
 v1.2.0, 2014-10-14 -- Python 2 and 3 compat. Changed definitions, rewordings. Cleaning. PEP8. Refactoring.
 v1.2.1, 2014-10-15 -- Removed DC related stuff (moved to dcitools).
 v1.2.2, 2014-10-15 -- FTP logging reviewed.
+v1.2.4, 2014-12-03 -- Added service feature + Lazy Load + Misc Fixes
 
-v1.2.4-dev, 2014-12-03 -- Added service feature + Lazy Load + Misc Fixes
-v1.2.4-dev, 2014-12-03 -- Added service feature + Lazy Load + Misc Fixes
-v1.2.4-dev, 2014-12-03 -- Added service feature + Lazy Load + Misc Fixes
-v1.2.4a-dev, 2014-12-03 -- Misc
-v1.2.4b-dev, 2014-12-03 -- Work in progress on hooks
-v1.2.4c-dev, 2014-12-03 -- Testing git hooks
+v1.2.4a, 2014-12-03 -- Git hooks!
