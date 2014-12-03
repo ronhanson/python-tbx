@@ -16,3 +16,4 @@ v1.2.4a, 2014-12-03 -- Git hooks!
 
 v1.2.4b, 2014-12-03 -- Merge branch
 v1.2.5, 2014-12-03 -- Git Hooks!
+v1.2.5a, 2014-12-03 -- Git hooks tests
