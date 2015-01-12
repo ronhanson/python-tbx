@@ -1,23 +1,24 @@
-v1.0.0, 2014-01-22 -- Initial release under another repo.
-v1.0.1, 2014-05-13 -- Created full repo for that toolbox.
-v1.0.2, 2014-05-15 -- Bugfixes, some function more, and scripts to build deb.
-v1.0.3, 2014-05-21 -- Bugfixes, on logs and other stuffs.
-v1.0.4, 2014-06-04 -- Process functions added + get ip script
-v1.0.5, 2014-06-13 -- FTP features, file lists, etc.
-v1.1.0, 2014-10-12 -- Python 3 compat + Lazy Loading modules + reviewed bytes + misc changes
-v1.1.1, 2014-10-13 -- More work on bytes manipulations, etc.
-v1.1.2, 2014-10-14 -- Changes to bytes
-v1.2.0, 2014-10-14 -- Python 2 and 3 compat. Changed definitions, rewordings. Cleaning. PEP8. Refactoring.
-v1.2.1, 2014-10-15 -- Removed DC related stuff (moved to dcitools).
-v1.2.2, 2014-10-15 -- FTP logging reviewed.
-v1.2.3, 2014-10-27 -- Added Lazy Loading into 'code'.
-v1.2.4, 2014-11-05 -- Added service features. Small changes. 
-v1.2.4a, 2014-12-03 -- Git hooks!
-v1.2.4b, 2014-12-03 -- Merge branch
-v1.2.5, 2014-12-03 -- Git Hooks!
-v1.2.5a, 2014-12-03 -- Git hooks tests
-v1.2.5a, 2015-01-12 -- bugfix
-v1.2.5b, 2015-01-12 -- bugfix
-v1.2.6, 2015-01-12 -- Small addons. FTP bugfix.
-
-v1.2.6a, 2015-01-12 -- Bugfixes on hooks
+v1.0.0	-- 2014-01-22 -- Initial release under another repo.
+v1.0.1	-- 2014-05-13 -- Created full repo for that toolbox.
+v1.0.2	-- 2014-05-15 -- Bugfixes	-- some function more	-- and scripts to build deb.
+v1.0.3	-- 2014-05-21 -- Bugfixes	-- on logs and other stuffs.
+v1.0.4	-- 2014-06-04 -- Process functions added + get ip script
+v1.0.5	-- 2014-06-13 -- FTP features	-- file lists	-- etc.
+v1.1.0	-- 2014-10-12 -- Python 3 compat + Lazy Loading modules + reviewed bytes + misc changes
+v1.1.1	-- 2014-10-13 -- More work on bytes manipulations	-- etc.
+v1.1.2	-- 2014-10-14 -- Changes to bytes
+v1.2.0	-- 2014-10-14 -- Python 2 and 3 compat. Changed definitions	-- rewordings. Cleaning. PEP8. Refactoring.
+v1.2.1	-- 2014-10-15 -- Removed DC related stuff (moved to dcitools).
+v1.2.2	-- 2014-10-15 -- FTP logging reviewed.
+v1.2.3	-- 2014-10-27 -- Added Lazy Loading into 'code'.
+v1.2.4	-- 2014-11-05 -- Added service features. Small changes. 
+v1.2.4a	-- 2014-12-03 -- Git hooks!
+v1.2.4b	-- 2014-12-03 -- Merge branch
+v1.2.5	-- 2014-12-03 -- Git Hooks!
+v1.2.5a	-- 2014-12-03 -- Git hooks tests
+v1.2.5a	-- 2015-01-12 -- Bugfix
+v1.2.5b	-- 2015-01-12 -- Bugfix
+v1.2.6	-- 2015-01-12 -- Small addons. FTP bugfix.
+v1.2.6a	-- 2015-01-12 -- Bugfixes on hooks
+v1.2.6b	-- 2015-01-12 -- Bugfix
+2015-01-12 -- v1.2.6c -- Updated hooks
