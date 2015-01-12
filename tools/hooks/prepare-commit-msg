@@ -19,7 +19,6 @@ if six.PY3:
     raw_input = input
 
 
-
 # This is required because git hooks are run in non-interactive
 # mode. You aren't technically supposed to have access to stdin.
 # This hack works on MaxOS and Linux. Mileage may vary on Windows.
@@ -38,7 +37,7 @@ def main(commit_message_filepath):
         with open(commit_message_filepath, 'r') as f:
             content = f.read()
 
-    content = commit_message + '\n' + content
+    content = commit_message + '\n\n' + content
 
     with open(commit_message_filepath, 'w') as f:
         f.write(content)
