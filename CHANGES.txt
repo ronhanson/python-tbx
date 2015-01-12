@@ -24,3 +24,4 @@ v1.2.6b	-- 2015-01-12 -- Bugfix
 2015-01-12 -- v1.2.6c -- Updated hooks
 2015-01-12 -- v1.2.6d -- Updated hooks
 2015-01-12 -- v1.2.6e -- Updated hooks
+2015-01-12 -- v1.2.6f -- Updated Hooks
