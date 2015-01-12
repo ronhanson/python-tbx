@@ -103,7 +103,7 @@ def launch_function(function, description=None, **kwargs):
     return launch_service(custom_service, description=description)
 
 
-def launch_service(service, description=None, **kwargs):
+def launch_service(service, description=None, parser_callback=None, **kwargs):
     if not description:
         description = service.__doc__
 
@@ -118,9 +118,17 @@ def launch_service(service, description=None, **kwargs):
     parser.add_argument("-d", "--debug", dest="debug", action="store_true",
                         help="Debug mode.", default=False)
 
+    if parser_callback:
+        parser_callback(parser)
+
     args = parser.parse_args()
 
-    kwargs.update({'debug': args.debug})
+    # get the data out of args
+    data = dict(args._get_kwargs())
+    data.pop('loop')
+    data.pop('loop_duration')
+
+    kwargs.update(data)  # this will set kwargs["debug"] value at least, plus the arguments added by the parser_callback
 
     result = None
     svc = service(**kwargs)
@@ -131,6 +139,7 @@ def launch_service(service, description=None, **kwargs):
         result = svc.run()
 
     logging.info("Exiting %s service." % svc.service_name)
+    svc.destroy()
 
     return result
 

@@ -12,17 +12,28 @@ import pyftpdlib.servers
 import pyftpdlib.handlers
 from . import text
 
+try:
+    from pyftpdlib.handlers import TLS_FTPHandler as SFTPHandler
+except ImportError:
+    from pyftpdlib.handlers import FTPHandler as SFTPHandler  # If that case happens, install pyopenssl
+
 
 class FTPEventLogger:
 
-    def __init__(self):
-        pass
+    def on_connect(self):
+        self.log("Connection received.")
+
+    def on_disconnect(self):
+        self.log("Disconnection.")
 
     def log(self, msg, logfun=None, error=False):
         raise Exception('Sub classes should override this function.')
 
     def on_login(self, username):
         self.log("User %s logged in." % username)
+
+    def on_login_failed(self, username, password):
+        self.log("Login failed with credentials %s/%s." % (username, password))
 
     def on_logout(self, username):
         self.log("User %s logged out." % username)
@@ -37,11 +48,13 @@ class FTPEventLogger:
 
     def on_incomplete_file_sent(self, filepath):
         filepath = text.convert_to_unicode(filepath)
-        self.log(u"File %s has been Incompletely sent by user %s... Waiting for the user to resume his download." % (filepath, self.username), error=True)
+        self.log("""File %s has been Incompletely sent by user %s...
+        Waiting for the user to resume his download.""" % (filepath, self.username), error=True)
 
     def on_incomplete_file_received(self, filepath):
         filepath = text.convert_to_unicode(filepath)
-        self.log(u"A new file %s has been uploaded but is incomplete by user %s... Waiting for the user to resume his upload." % (filepath, self.username), error=True)
+        self.log("""A new file %s has been uploaded but is incomplete by user %s...
+        Waiting for the user to resume his upload.""" % (filepath, self.username), error=True)
 
 
 class FTPHandler(FTPEventLogger, pyftpdlib.handlers.FTPHandler):
@@ -53,7 +66,7 @@ class FTPHandler(FTPEventLogger, pyftpdlib.handlers.FTPHandler):
             logging.info("[FTP] %s" % msg)
 
 
-class SecureFTPHandler(FTPEventLogger):
+class SecureFTPHandler(FTPEventLogger, SFTPHandler):
 
     def log(self, msg, logfun=None, error=False):
         if error:
@@ -82,9 +95,6 @@ class DummyDictFTPAuthorizer(pyftpdlib.handlers.DummyAuthorizer):
          - "w" = store a file to the server (STOR, STOU commands)
     """
 
-    read_perms = "elr"
-    write_perms = "adfmw"
-
     def __init__(self, users):
         """
         Constructor
@@ -94,11 +104,11 @@ class DummyDictFTPAuthorizer(pyftpdlib.handlers.DummyAuthorizer):
             self.add_user(username,
                           user['password'],
                           user['homedir'],
-                          perm=user.get('perm', 'elr'),
+                          perm=user.get('perm', self.read_perms),
                           msg_login="Hi %s, you're welcome here." % user.get('name', username),
                           msg_quit="Bye %s, hoping you get back soon!" % user.get('name', username)
             )
-        self.users = users
+        self.custom_users = users
 
 
 def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5700', name="Ronan Python FTP Server", masquerade_ip=None, max_connection=500, max_connection_per_ip=10):
@@ -123,8 +133,8 @@ def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5
     if masquerade_ip:
         handler.masquerade_address = masquerade_ip
 
-    logging.getLogger('pyftpdlib').disabled = True
-    pyftpdlib.log.logger = logging.getLogger() # Replace pyftpd logger by default logger
+    #logging.getLogger('pyftpdlib').disabled = True
+    pyftpdlib.log.logger = logging.getLogger()  # Replace pyftpd logger by default logger
 
     # Instantiate FTP server class and listen to 0.0.0.0:21 or whatever is written in the config
     address = (listen_to, port)
@@ -137,8 +147,8 @@ def create_server(handler, users, listen_to="", port=21, data_port_range='5500-5
     return server
 
 
-def create_ftp_server(users, listen_to="", port=21, data_port_range='5500-5700', name="FTP Server",
-                      masquerade_ip=None,max_connection=500, max_connection_per_ip=10):
+def create_ftp_server(users, listen_to="", port=21, data_port_range='5500-5700',
+                      name="FTP Server", masquerade_ip=None, max_connection=500, max_connection_per_ip=10):
     """
         FTP Server implements normal FTP mode.
     """
@@ -148,8 +158,8 @@ def create_ftp_server(users, listen_to="", port=21, data_port_range='5500-5700',
                          max_connection_per_ip=max_connection_per_ip)
 
 
-def create_secure_ftp_server(users, certificate, listen_to="", port=990, data_port_range='5700-5900', name="FTP Server",
-                             masquerade_ip=None, max_connection=500, max_connection_per_ip=10):
+def create_secure_ftp_server(users, certificate, listen_to="", port=990, data_port_range='5700-5900',
+                             name="FTP Server", masquerade_ip=None, max_connection=500, max_connection_per_ip=10):
     """
         FTP Server implements FTPS (FTP over TLS/SSL) mode.
           Note: Connect from client using "FTP over TLS/SSL explicit mode".
@@ -178,7 +188,7 @@ class FTPSession(ftplib.FTP):
     """
     Usage :
         import ftputil
-        with ftputil.FTPHost('my.server.url.or.ip', user='root', password='hello', 2121, session_factory=FTPSession) as host:
-            names = host.listdir(host.curdir)
-            print(names)
+        host = ftputil.FTPHost('my.server.url.or.ip', user='root', password='hello', 2121, session_factory=FTPSession)
+        names = host.listdir(host.curdir)
+        print(names)
     """

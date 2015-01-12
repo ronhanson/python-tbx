@@ -13,9 +13,9 @@ v1.2.2, 2014-10-15 -- FTP logging reviewed.
 v1.2.3, 2014-10-27 -- Added Lazy Loading into 'code'.
 v1.2.4, 2014-11-05 -- Added service features. Small changes. 
 v1.2.4a, 2014-12-03 -- Git hooks!
-
 v1.2.4b, 2014-12-03 -- Merge branch
 v1.2.5, 2014-12-03 -- Git Hooks!
 v1.2.5a, 2014-12-03 -- Git hooks tests
 v1.2.5a, 2015-01-12 -- bugfix
 v1.2.5b, 2015-01-12 -- bugfix
+v1.2.6, 2015-01-12 -- Small addons. FTP bugfix.
