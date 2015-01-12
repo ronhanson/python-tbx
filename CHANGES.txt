@@ -19,3 +19,5 @@ v1.2.5a, 2014-12-03 -- Git hooks tests
 v1.2.5a, 2015-01-12 -- bugfix
 v1.2.5b, 2015-01-12 -- bugfix
 v1.2.6, 2015-01-12 -- Small addons. FTP bugfix.
+
+v1.2.6a, 2015-01-12 -- Bugfixes on hooks
