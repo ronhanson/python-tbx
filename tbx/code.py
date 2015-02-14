@@ -160,9 +160,12 @@ def get_method_documentation(method):
 
 
 def get_subclasses(klass):
+    assert isinstance(klass, type)
     klasses = klass.__subclasses__()
-    klasses = reduce(lambda x, y: x + get_subclasses(y), klasses, klasses)
-    return list(set(klasses))
+    klasses2 = klasses
+    for y in klasses:
+        klasses2 += get_subclasses(y)
+    return list(set(klasses2))
 
 
 class SerializableObject(object):
