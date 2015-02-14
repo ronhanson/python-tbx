@@ -9,7 +9,7 @@ requirements = [r.strip() for r in open('requirements.txt').readlines() if not r
 requirements = [r if ('git+' not in r) else re.sub(r".*egg=(.*)", r"\1", r).strip() for r in requirements]
 
 setup(
-    name='toolbox',
+    name='tbx',
     version=open('VERSION.txt').read().strip(),
     author='Ronan Delacroix',
     author_email='ronan.delacroix@gmail.com',
@@ -22,14 +22,13 @@ setup(
     include_package_data=True,
     install_requires=requirements,
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Environment :: Console',
-        'Intended Audience :: End Users/Desktop',
+        'Topic :: Software Development :: Libraries',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
-        'Intended Audience :: System Administrators',
-        'License :: Proprietary',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: POSIX',
-        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
     ],
 )

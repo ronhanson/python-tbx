@@ -9,7 +9,6 @@ Versionning Utility - Pre Commit Git Hook
 import sys
 import os
 import os.path
-import argparse
 import six
 import re
 from datetime import date
