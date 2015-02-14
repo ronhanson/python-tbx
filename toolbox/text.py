@@ -29,7 +29,7 @@ else:
 
 
 def normalize_text(text):
-    return unicodedata.normalize('NFKD', text).encode('ascii', 'ignore')
+    return unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
 
 
 def slugify(text, delim='-'):
