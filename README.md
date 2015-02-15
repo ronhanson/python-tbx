@@ -2,95 +2,97 @@ Python TBX - Toolbox Library
 ============================
 
 
-## Author & Licence
+Author & Licence
+----------------
 
 Copyright (c) 2010-2015 Ronan Delacroix
 
-This program is released under [MIT Licence](LICENCE.txt).
+This program is released under MIT Licence.
 
 
-## Goal
+Goal
+----
 
 This library is a collection of very different tools created over the years. As a library, this has no purpose by itself and should be used by other projects.
 
 
-## Description
+Description
+-----------
 
 The library contains several unrelated tool collections :
 
 
-- **tbx.bytes** : bytes manipulation
+- **tbx.bytes** - Byte manipulation
 
     *Allows encoding and decoding of various formats.*
 
-- **tbx.code** : useful coding tools
+- **tbx.code** - Useful coding tools
 
     *Singleton, method documentation parsing, module lazy-load, serializable object, etc.*
 
-- **tbx.file** : file manipulation functions.
+- **tbx.file** - File manipulation
 
     *Recursive file listing, linux based unzip/untar/etc.*
 
-- **tbx.ftp** : FTP Server helpers.
+- **tbx.ftp** - FTP Server helpers
 
     *Server creation helpers, event handlers. Based on awesome pyftpdlib.*
 
-- **tbx.log** : Logging helpers.
+- **tbx.log** - Logging helpers
 
     *Helps with logging configuration from settings file.*
 
-- **tbx.network** : Network helpers.
+- **tbx.network** - Network helpers
 
     *Provides a dummy socket client and a get_local_ip_address function.*
 
-- **tbx.process** : Multiprocessing helpers.
+- **tbx.process** - Multiprocessing helpers
 
     *Provides a versatile "execute" function, but also a daemonize function, and some more.*
 
-- **tbx.sequential** : File sequence detection.
+- **tbx.sequential** - File sequence detection
 
     *Provides useful detection of file sequence.*
 
-- **tbx.service** : Service helper.
+- **tbx.service** - Service helpers
 
-    *A class allowing to build a small loop based service in no time.*
+    *A class allowing to build a small loop-based service in no time.*
 
-- **tbx.settings** : Settings helpers.
+- **tbx.settings** - Settings helpers
 
     *Allows to easily retrieve and validate settings file.*
 
-- **tbx.snmp** : SNMP helpers.
+- **tbx.snmp** - SNMP helpers
 
     *Small helper to send a snmp request throught pysnmp.*
 
-- **template** : Templating helpers.
+- **template** - Templating helpers
 
     *Provides useful helpers for Jinja templating system.*
 
-- **tbx.text** : Useful collection of text manipulation tools.
+- **tbx.text** - Text manipulation tools
 
     *Includes dict to XML/HTML/Text functions. Provides a simple sendmail method and miscellaneous text related methods.*
 
-- **tbx.env_settings** : environment based settings
+- **tbx.env_settings** - Environment based settings
 
     *Deprecated*
 
 
-##Usage
+Usage
+-----
 
 Just look at the code as it is commented for your to understand its usage.
 
-
 No big doc made yet. This is more of a personal collection of snippets and tools.
-
 
 But if somebody is interested or requests it, I will make a better doc.
 
 
-##Compatibility
+Compatibility
+-------------
 
 This libraries are used most on Linux and OSX systems, but plenty of functions may work on windows.
-
 
 This libraries are compatibles with Python 2.X and Python 3.X.
 

@@ -26,3 +26,4 @@
 2015-02-14  --  v1.3.1  -- Small fix
 2015-02-14  --  v1.3.1a -- Updated .deb dependencies
 2015-02-14	--	v1.3.1b	-- Reformatted version.txt and updated git hook.
+2015-02-15	--	v1.3.1c	-- Updated README
