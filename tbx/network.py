@@ -8,6 +8,7 @@ Network Utils
 """
 
 import socket
+import logging
 
 
 PACKET_SIZE = 4096
@@ -54,9 +55,11 @@ class SocketClient:
             self.sock.connect((self.host, self.port))
             return self.sock
         except socket.error as ex:
-            raise Exception('Unable to connect socket on %s:%s - Error %s' % (self.host, self.port, ex))
+            logging.error('Exception while connecting socket on %s:%s - Error %s' % (self.host, self.port, ex))
+            raise
         except Exception as ex:
-            raise Exception('Unable to connect socket on %s:%s - Error %s' % (self.host, self.port, ex))
+            logging.exception('Exception while connecting socket on %s:%s - Error %s' % (self.host, self.port, ex))
+            raise
 
     def send_by_packet(self, data):
         """
