@@ -2,18 +2,13 @@ Python TBX - Toolbox Library
 ============================
 
 
-Author & Licence
-----------------
+About
+-----
 
-Copyright (c) 2010-2015 Ronan Delacroix
+Python Toolbox aka TBX is a collection of very different tools created over the years to simplify my coding.
+As a library, this has no purpose by itself and should be used by other projects.
 
-This program is released under MIT Licence.
-
-
-Goal
-----
-
-This library is a collection of very different tools created over the years. As a library, this has no purpose by itself and should be used by other projects.
+Project url : https://github.com/ronhanson/python-tbx
 
 
 Description
@@ -97,3 +92,11 @@ This libraries are used most on Linux and OSX systems, but plenty of functions m
 This libraries are compatibles with Python 2.X and Python 3.X.
 
 Mainly tested on 2.7 and 3.4.
+
+
+Author & Licence
+----------------
+
+Copyright (c) 2010-2015 Ronan Delacroix
+
+This program is released under MIT Licence. Feel free to use it or part of it anywhere you want.
