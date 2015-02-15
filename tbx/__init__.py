@@ -3,7 +3,7 @@
 # vim: ai ts=4 sts=4 et sw=4 nu
 """
 (c) 2014 Ronan Delacroix
-Toolbox Lazy Sub-module Loading
+TBX Lazy Sub-module Loading
 :author: Ronan Delacroix
 """
 from . import code

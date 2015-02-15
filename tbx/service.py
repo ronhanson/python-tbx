@@ -11,16 +11,16 @@
     def my_service(arg=None):
         print('Hello %s' % arg)
 
-    toolbox.service.launch_function(my_service, arg="Ronan")
+    tbx.service.launch_function(my_service, arg="Ronan")
 
 
 2 - HOW TO WITH CLASS :
 
-    class MyService(toolbox.service.Service):
+    class MyService(tbx.service.Service):
         def run(self):
             print("Hello %s (debug:%s)" % (self.arg, self.debug))
 
-    toolbox.service.launch_service(MyService, arg="Ronan")
+    tbx.service.launch_service(MyService, arg="Ronan")
 
 """
 import logging

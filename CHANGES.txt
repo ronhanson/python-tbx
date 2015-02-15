@@ -31,3 +31,4 @@
 2015-02-15	--	v1.3.2	-- Updated version to allow pypi upload.
 2015-02-15	--	v1.3.2	-- Updated version only
 2015-02-15	--	v1.3.3	-- Better socket connection error handling (no more ebroad exception catch)
+2015-02-15	--	v1.3.3a	-- Very minor cosmetic removal of the toolbox name in comments
