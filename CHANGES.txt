@@ -28,3 +28,5 @@
 2015-02-14	--	v1.3.1b	-- Reformatted version.txt and updated git hook.
 2015-02-15	--	v1.3.1c	-- Updated README
 2015-02-15	--	v1.3.1d	-- Added project url to readme and setup.py.
+2015-02-15	--	v1.3.2	-- Updated version to allow pypi upload.
+2015-02-15	--	v1.3.2	-- Updated version only
