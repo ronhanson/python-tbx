@@ -36,3 +36,4 @@
 
 2015-03-12	--	v1.3.4	-- Changes in dependencies
 2015-03-17	--	v1.3.5	-- Updated hooks and build script
+2015-03-18	--	v1.3.6	-- Updated Service command arguments

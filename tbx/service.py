@@ -109,12 +109,12 @@ def launch_service(service, description=None, parser_callback=None, **kwargs):
 
     parser = argparse.ArgumentParser(description=description)
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-1', '--once', dest='loop', action="store_false",
-                       help='Run the service once.', default="loop")
     group.add_argument('-l', '--loop', dest='loop', action="store_true",
-                       help='Run the service in loop mode (Default).')
+                       help='Run the service in loop mode (Default mode).', default=True)
+    group.add_argument('-1', '--once', dest='loop', action="store_false",
+                       help='Run the service once.', default=True)
     parser.add_argument("-t", "--loop-duration", dest="loop_duration", type=float,
-                        help="Looping duration.", metavar='T', default=1.0)
+                        help="Looping duration in seconds (Default 5).", metavar='DURATION', default=5.0)
     parser.add_argument("-d", "--debug", dest="debug", action="store_true",
                         help="Debug mode.", default=False)
 
