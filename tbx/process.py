@@ -103,7 +103,7 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
     logfile_writer.write(header)
     logfile_writer.flush()
 
-    logfile_reader = open(log_file, 'r')
+    logfile_reader = open(log_file, 'rb')
     logfile_reader.seek(0, os.SEEK_END)
     logfile_start_position = logfile_reader.tell()
 
@@ -119,7 +119,7 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
     # It will transform the child process "sh" into the "command exectable" because of the "exec".
     # Said more accuratly, it won't fork to create launch the command in a sub sub process.
     # Therefore, when you kill the child process, you kill the "command" process and not the unecessary "sh" parent process.
-    process = subprocess.Popen(u"exec %s" % text_utils.convert_to_unicode(command), stdout=logfile_writer, stderr=err_logfile_writer, bufsize=1, shell=True, cwd=working_folder, env=env)
+    process = subprocess.Popen(u"exec %s" % text_utils.uni(command), stdout=logfile_writer, stderr=err_logfile_writer, bufsize=1, shell=True, cwd=working_folder, env=env)
 
     while process.poll() == None:
         # In order to avoid unecessary cpu usage, we wait for "poll_timing" seconds ( default: 0.1 sec )
@@ -137,17 +137,17 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
         # Line function call:
         #   => if line_function is defined, we call it on each new line of the file.
         if line_function:
-            o = logfile_reader.readline().rstrip()
+            o = text_utils.uni(logfile_reader.readline()).rstrip()
             while o != '':
                 line_function(o)
-                o = logfile_reader.readline().rstrip()
+                o = text_utils.uni(logfile_reader.readline()).rstrip()
 
     if not return_output:
         # Return result code and ensure we have waited for the end of sub process
         return process.wait()
 
     logfile_reader.seek(logfile_start_position, os.SEEK_SET) #back to the beginning of the file
-    return str(logfile_reader.read())
+    return text_utils.uni(logfile_reader.read())
 
 
 def daemonize(umask=0, work_dir="/", max_fd=1024, redirect="/dev/null"):

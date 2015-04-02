@@ -15,6 +15,8 @@ import re
 import smtplib
 import unicodedata
 import six
+import uuid as UUID
+import base64
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -42,6 +44,30 @@ def slugify(text, delim='-'):
         if word:
             result.append(word)
     return delim.join(result)
+
+
+def slugify_bytes(b):
+    return base64.urlsafe_b64encode(b).decode('utf-8').strip('=')
+
+
+def uuid_to_slug(uuid):
+    if isinstance(uuid, str):
+        b = UUID.UUID(uuid)
+    elif isinstance(uuid, UUID.UUID):
+        b = uuid.bytes
+    elif isinstance(uuid, bytes):
+        b = uuid
+    else:
+        b = bytes(uuid)
+    return slugify_bytes(b)
+
+
+def random_slug():
+    return uuid_to_slug(UUID.uuid4().bytes)
+
+
+def random_short_slug():
+    return uuid_to_slug(UUID.uuid4().bytes[0:8])
 
 
 def javascript_escape(s, quote_double_quotes=True):
@@ -162,6 +188,10 @@ mime_rendering_dict = {
 }
 
 
+def render_dict_from_mimetype(d, mimetype):
+    return mime_rendering_dict.get(mimetype, render_json)(d)
+
+
 def pretty_render(data, format='text', indent=0):
     """
     Render a dict based on a format
@@ -211,7 +241,7 @@ def dict_to_xml(xml_dict):
     """
     Converts a dictionary to an XML ElementTree Element
     """
-    root_tag = xml_dict.keys()[0]
+    root_tag = list(xml_dict.keys())[0]
     root = etree.Element(root_tag)
     _dict_to_xml_recurse(root, xml_dict[root_tag])
     return root
