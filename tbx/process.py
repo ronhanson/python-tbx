@@ -119,7 +119,9 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
     # It will transform the child process "sh" into the "command exectable" because of the "exec".
     # Said more accuratly, it won't fork to create launch the command in a sub sub process.
     # Therefore, when you kill the child process, you kill the "command" process and not the unecessary "sh" parent process.
-    process = subprocess.Popen(u"exec %s" % text_utils.uni(command), stdout=logfile_writer, stderr=err_logfile_writer, bufsize=1, shell=True, cwd=working_folder, env=env)
+    if sys.platform != 'win32':
+        command = u"exec %s" % text_utils.uni(command)
+    process = subprocess.Popen(command, stdout=logfile_writer, stderr=err_logfile_writer, bufsize=1, shell=True, cwd=working_folder, env=env)
 
     while process.poll() == None:
         # In order to avoid unecessary cpu usage, we wait for "poll_timing" seconds ( default: 0.1 sec )
