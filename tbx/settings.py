@@ -7,12 +7,19 @@ Settings Utils
 :author: Ronan Delacroix
 """
 import os
+import platform
 from . import code
 from configobj import ConfigObj, ConfigObjError, flatten_errors
 from validate import Validator
 
 
-def from_file(name="config", application_name=None, path_template="/etc/<app_name>"):
+def from_file(name="config", application_name=None, path_template=None):
+
+    if not path_template:
+        system_config_path = "/etc/"
+        if platform.system() == "Windows":
+            system_config_path = "C:/python_app_settings/"
+        path_template = system_config_path + "<app_name>"
 
     script_folder, app_name = code.get_app_name()
     if not application_name:
