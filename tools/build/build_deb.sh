@@ -1,21 +1,19 @@
 #!/bin/bash
 cd ../..
-echo "Packaging Python .tar.gz package."
-echo ""
-python3 setup.py sdist #--dist-dir /tmp/python-dist
-#cp debian.cfg stdeb.cfg
-#mv stdeb.cfg *.egg-info/
+
+mv requirements.txt _requirements.txt
+touch requirements.txt
 
 echo ""
-echo "Python package complete. Packaging .DEB now..."
+echo "Packaging .DEB now..."
 echo ""
-#py2dsc-deb `ls -1 dist/*.tar.gz | tail -n1`
-python3 setup.py --command-packages=stdeb.command sdist_dsc --with-python2=True --with-python3=True --dist-dir=deb_dist --extra-cfg-file=debian.cfg --use-premade-distfile=`ls -1 dist/*.tar.gz | tail -n1` bdist_deb
+python3 setup.py --command-packages=stdeb.command sdist_dsc -i --with-python2=True --with-python3=True --dist-dir=deb_dist --extra-cfg-file=debian.cfg --ignore-install-requires 
 
 echo ""
 echo "Copying post install script..."
 echo ""
-cp -Rv debian/* deb_dist/*/debian/
+#cp -Rv debian/* deb_dist/*/debian/
+#chmod +x deb_dist/*/debian/*postinst
 
 echo ""
 echo "Rebuilding package with postinst script..."
@@ -32,5 +30,9 @@ mv `ls deb_dist/*.deb` ./build/
 echo "   .deb moved into 'build' folder : "
 ls build/*.deb
 echo ""
+
+cp _requirements.txt requirements.txt
+rm _requirements.txt
+
 cd tools/build/
 source ./clean_deb.sh
