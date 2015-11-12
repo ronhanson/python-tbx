@@ -41,3 +41,4 @@
 2015-04-03	--	v1.4.1	-- Fix for windows on process.execute method.
 2015-04-13	--	v1.4.2	-- Small settings update for Windows machine
 2015-11-13	--	v1.4.3	-- build scripts update
+2015-11-13	--	v1.4.4-stable	-- packaging review
