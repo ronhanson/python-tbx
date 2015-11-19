@@ -67,7 +67,7 @@ def add_syslog_logging(logger, settings={}):
             syslog_address = '/var/run/syslog'
         else:
             syslog_address = '/dev/log'
-    syslog_format = settings.get('SYSLOG_FORMAT', '[%(asctime)s] [%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)s - %(message)s')
+    syslog_format = settings.get('SYSLOG_FORMAT', '[%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)s - %(message)s')
     write_to_syslog_handler = logging.handlers.SysLogHandler(address=syslog_address)
     syslog_formatter = logging.Formatter(syslog_format, '%Y-%m-%dT%H:%M:%S')
     write_to_syslog_handler.setFormatter(syslog_formatter)

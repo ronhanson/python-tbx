@@ -42,3 +42,4 @@
 2015-04-13	--	v1.4.2	-- Small settings update for Windows machine
 2015-11-13	--	v1.4.3	-- build scripts update
 2015-11-13	--	v1.4.4-stable	-- packaging review
+2015-11-19	--	v1.4.5	-- fix syslogs without datetime
