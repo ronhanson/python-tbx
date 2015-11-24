@@ -16,6 +16,7 @@ from datetime import datetime
 import time
 import tempfile
 import re
+import shutil
 
 import logging
 from . import text as text_utils
@@ -83,9 +84,11 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
         :returns:   Standard output of the command or if return_output=False, it will give the "return code" of the command
     """
 
+    tmp_log = False
     if log_settings:
         log_folder = log_settings.get('LOG_FOLDER')
     else:
+        tmp_log = True
         log_folder = tempfile.mkdtemp()
 
     if not log_file:
@@ -149,7 +152,20 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
         return process.wait()
 
     logfile_reader.seek(logfile_start_position, os.SEEK_SET) #back to the beginning of the file
-    return text_utils.uni(logfile_reader.read())
+
+    res = text_utils.uni(logfile_reader.read())
+
+    try:
+        logfile_reader.close()
+        logfile_writer.close()
+        err_logfile_writer.close()
+
+        if tmp_log:
+            shutil.rmtree(log_folder, ignore_errors=True)
+    except:
+        pass
+
+    return res
 
 
 def daemonize(umask=0, work_dir="/", max_fd=1024, redirect="/dev/null"):
