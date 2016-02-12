@@ -34,6 +34,8 @@ class Service:
     Can be launched once or in loop mode.
     """
     def __init__(self, **kwargs):
+        self.loop_duration = kwargs.pop('loop_duration', 1.0)
+
         logging.debug("Created service %s" % self.service_name)
         for k in kwargs:
             setattr(self, k, kwargs[k])
@@ -64,7 +66,7 @@ class Service:
         """
         raise Exception('run method shall be overridden in sub class.')
 
-    def loop(self, loop_duration=1.0):
+    def loop(self):
         """
         Run the demo suite in a loop.
         """
@@ -74,7 +76,7 @@ class Service:
         while True:
             try:
                 res = self.run()
-                time.sleep(loop_duration)
+                time.sleep(self.loop_duration)
             except KeyboardInterrupt:
                 logging.warning("Keyboard Interrupt during loop, stopping %s service now..." % self.service_name)
                 break
@@ -114,7 +116,7 @@ def launch_service(service, description=None, parser_callback=None, **kwargs):
     group.add_argument('-1', '--once', dest='loop', action="store_false",
                        help='Run the service once.', default=True)
     parser.add_argument("-t", "--loop-duration", dest="loop_duration", type=float,
-                        help="Looping duration in seconds (Default 5).", metavar='DURATION', default=5.0)
+                        help="Looping duration in seconds (Default 2).", metavar='DURATION', default=2.0)
     parser.add_argument("-d", "--debug", dest="debug", action="store_true",
                         help="Debug mode.", default=False)
 
@@ -132,9 +134,10 @@ def launch_service(service, description=None, parser_callback=None, **kwargs):
 
     result = None
     svc = service(**kwargs)
+    svc.loop_duration = args.loop_duration
 
     if args.loop:
-        result = svc.loop(loop_duration=args.loop_duration)
+        result = svc.loop()
     else:
         result = svc.run()
 
