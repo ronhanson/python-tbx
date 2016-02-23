@@ -116,7 +116,10 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
         err_logfile_writer = logfile_writer
 
     start = datetime.now()
-    logger.info(u"\n\nExecuting command (timeout=%s) :\n\t%s\n" % (timeout, command) )
+    timeout_string = ""
+    if timeout:
+        timeout_string = "(timeout=%s)" % timeout
+    logger.info(u"Executing command %s :\n\t\t%s" % (timeout_string, command) )
 
     # We use "exec <command>" as Popen launches a shell, that runs the command.
     # It will transform the child process "sh" into the "command exectable" because of the "exec".

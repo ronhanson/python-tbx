@@ -7,13 +7,15 @@ touch requirements.txt
 echo ""
 echo "Packaging .DEB now..."
 echo ""
-python3 setup.py --command-packages=stdeb.command sdist_dsc -i --with-python2=True --with-python3=True --dist-dir=deb_dist --extra-cfg-file=debian.cfg --ignore-install-requires 
+python3 setup.py --command-packages=stdeb.command sdist_dsc -i --with-python2=True --with-python3=True --dist-dir=deb_dist --extra-cfg-file=debian.cfg --ignore-install-requires
 
 echo ""
 echo "Copying post install script..."
 echo ""
-#cp -Rv debian/* deb_dist/*/debian/
-#chmod +x deb_dist/*/debian/*postinst
+cp -Rv debian/* deb_dist/*/debian/
+chmod +x deb_dist/*/debian/*postinst
+chmod +x deb_dist/*/debian/*prerm
+chmod +x deb_dist/*/debian/*postrm
 
 echo ""
 echo "Rebuilding package with postinst script..."
