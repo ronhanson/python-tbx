@@ -116,7 +116,7 @@ def launch_service(service, description=None, parser_callback=None, **kwargs):
     group.add_argument('-1', '--once', dest='loop', action="store_false",
                        help='Run the service once.', default=True)
     parser.add_argument("-t", "--loop-duration", dest="loop_duration", type=float,
-                        help="Looping duration in seconds (Default 2).", metavar='DURATION', default=2.0)
+                        help="Looping duration in seconds (Default 2).", metavar='DURATION', default=1.0)
     parser.add_argument("-d", "--debug", dest="debug", action="store_true",
                         help="Debug mode.", default=False)
 
