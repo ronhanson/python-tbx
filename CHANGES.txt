@@ -49,3 +49,4 @@
 2016-02-23	--	v1.4.8	-- fix
 2016-02-25	--	v1.4.9	-- Loop every second for service
 2016-05-03	--	v1.4.10	-- pyftpdlib is not required then no error is thrown if not present. Same for ftplib.
+2016-07-08	--	v1.4.11	-- Small improvement to Attribute dict

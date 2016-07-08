@@ -50,7 +50,7 @@ class AttributeDict(dict):
         try:
             item = super(AttributeDict, self).__getitem__(attr)
         except KeyError:
-            return None
+            return AttributeDict()
         if isinstance(item, dict) and not isinstance(item, AttributeDict):
             new = AttributeDict(item)
             self.__setitem__(attr, new)
