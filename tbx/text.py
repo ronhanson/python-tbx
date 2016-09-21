@@ -93,7 +93,7 @@ def javascript_escape(s, quote_double_quotes=True):
     return str(ustring_re.sub(fix, s))
 
 
-def send_mail(send_from, send_to, subject, text, server, files=None):
+def send_mail(send_from, send_to, subject, text, server, mime='plain', files=None):
     """
     Send an email with attachments.
     :param send_from: from email adress
@@ -116,7 +116,7 @@ def send_mail(send_from, send_to, subject, text, server, files=None):
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = subject
 
-    msg.attach(MIMEText(text, 'html'))
+    msg.attach(MIMEText(text, mime))
 
     for f in files:
         part = MIMEBase('application', "octet-stream")
