@@ -6,10 +6,10 @@ Logging Utils
 """
 import sys
 import os
+import socket
 import logging
 import logging.handlers
 from . import code
-
 
 def configure_logging_to_screen(debug=False):
     level = 'INFO'
@@ -45,6 +45,9 @@ def configure_logger(logger, log_name, settings={}, application_name=None, force
 
         if 'FILE' in log_methods:
             add_file_logging(logger, log_name, application_name, settings)
+
+        if 'MONGO' in log_methods:
+            add_mongo_logging(logger, log_name, application_name, settings)
 
         logger.propagate = True
     
@@ -117,3 +120,47 @@ def add_file_logging(logger, log_name, application_name, settings={}):
     file_formatter = logging.Formatter(file_format, '%Y-%m-%dT%H:%M:%S')
     write_to_file_handler.setFormatter(file_formatter)
     logger.addHandler(write_to_file_handler)
+
+
+def add_mongo_logging(logger, log_name, application_name, settings={}):
+    (script_folder, app_name) = code.get_app_name()
+    if not application_name:
+        application_name = app_name
+
+    try:
+        import log4mongo.handlers
+    except ImportError:
+        print("Impossible to log with MONGO handler as log4mongo library is not available.")
+        return
+
+    mongo_handler_class = log4mongo.handlers.MongoHandler
+    mongo_handler_args = {
+        'host': settings.get('LOGGING_MONGO_HOST', "localhost"),
+        'port': settings.get('LOGGING_MONGO_PORT', 27017),
+        'database_name': settings.get('LOGGING_MONGO_DATABASE', application_name),
+        'collection': settings.get('LOGGING_MONGO_COLLECTION', log_name+"_logs"),
+        'capped': settings.get('LOGGING_MONGO_CAPPED', True),
+        'capped_max': settings.get('LOGGING_MONGO_CAPPED_MAX', 100000),
+        'capped_size': settings.get('LOGGING_MONGO_CAPPED_SIZE', 10000000),
+    }
+    if settings.get('LOGGING_MONGO_BUFFER_SIZE', False):
+        mongo_handler_class = log4mongo.handlers.BufferedMongoHandler
+        mongo_handler_args.update({
+            'buffer_size': settings.get('LOGGING_MONGO_BUFFER_SIZE', 20),
+            'buffer_early_flush_level': settings.get('LOGGING_MONGO_BUFFER_FLUSH_LEVEL', logging.CRITICAL),
+            'buffer_periodical_flush_timing': settings.get('LOGGING_MONGO_BUFFER_FLUSH_TIMER', 5.0)
+        })
+
+    class MongoFilter(logging.Filter):
+        def filter(self, record):
+            record.application = application_name
+            record.log_name = log_name
+            record.hostname = socket.gethostname()
+            return True
+
+    logger.addFilter(MongoFilter())
+
+    log4mongo_handler = mongo_handler_class(**mongo_handler_args)
+
+    logger.addHandler(log4mongo_handler)
+

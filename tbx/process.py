@@ -15,8 +15,10 @@ import uuid as UUID
 from datetime import datetime
 import time
 import tempfile
+import threading
 import re
 import shutil
+import atexit
 
 import logging
 from . import text as text_utils
@@ -47,6 +49,28 @@ def synchronized(lock):
                 lock.release()
         return synchronize
     return wrap
+
+
+def call_repeatedly(func, interval, *args, **kwargs):
+    """
+    Call a function at interval
+    Returns both the thread object and the loop stopper Event.
+    """
+    main_thead = threading.current_thread()
+    stopped = threading.Event()
+
+    def loop():
+        while not stopped.wait(interval) and main_thead.is_alive():  # the first call is in `interval` secs
+            func(*args, **kwargs)
+
+        return
+
+    timer_thread = threading.Thread(target=loop, daemon=True)
+    timer_thread.start()
+
+    atexit.register(stopped.set)
+
+    return timer_thread, stopped.set
 
 
 def synchronized_limit(lock):
@@ -166,7 +190,7 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
         if tmp_log:
             shutil.rmtree(log_folder, ignore_errors=True)
     except:
-        pass
+        logger.exception("Error while cleaning after tbx.execute() call.")
 
     return res
 
