@@ -52,3 +52,4 @@
 2016-07-08	--	v1.4.11	-- Small improvement to Attribute dict
 2016-09-21	--	v1.4.12	-- Send email mime type added
 2016-10-21	--	v1.5.0	-- Mongo handler added. New call_repeatedly function.
+2016-10-28	--	v1.6.0	-- Added web file download shortcuts
