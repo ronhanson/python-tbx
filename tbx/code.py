@@ -75,6 +75,28 @@ class AttributeDict(dict):
         self[attr] = value
 
 
+def safe_dict(obj_or_func, **kwargs):
+    """
+    Create a dict from any object with all attributes, but not the ones starting with an underscore _
+    Useful for objects or function that return an object that have no __dict__ attribute, like psutil functions.
+    """
+    if callable(obj_or_func):
+        res = obj_or_func(**kwargs)
+    else:
+        res = obj_or_func
+    if hasattr(res, '__dict__'):
+        return res.__dict__
+
+    attributes = [i for i in dir(res) if not i.startswith('_')]
+    out = {}
+    for a in attributes:
+        val = getattr(res, a)
+        if val and not callable(val):
+            out[a] = val
+
+    return out
+
+
 class ProcessException(Exception):
     """
        Process Exception class.

@@ -11,12 +11,13 @@ import logging
 import logging.handlers
 from . import code
 
+
 def configure_logging_to_screen(debug=False):
     level = 'INFO'
     if debug:
         level = 'DEBUG'
     (script_folder, app_name) = code.get_app_name()
-    settings = {'LOGGING_LEVEL': level, 'LOGGING_METHODS': ['SCREEN'], 'SCREEN_FORMAT': '%(message)s'}
+    settings = {'LOGGING_LEVEL': level, 'LOGGING_METHODS': ['SCREEN'], 'SCREEN_FORMAT': '%(levelname)s\t| %(message)s'}
     configure_logger(logging.getLogger(), app_name, settings=settings)
 
 
