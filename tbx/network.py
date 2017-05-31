@@ -14,6 +14,12 @@ import logging
 PACKET_SIZE = 4096
 
 
+def get_mac_address():
+    from uuid import getnode
+    h = iter(hex(getnode())[2:].zfill(12))
+    return ":".join(i + next(h) for i in h)
+
+
 def get_local_ip_address(target):
     """
     Get the local ip address to access one specific target.

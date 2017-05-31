@@ -39,7 +39,7 @@ def configure_logger(logger, log_name, settings={}, application_name=None, force
 
         #make handlers, that write the logs to screen, file, syslog
         if 'SCREEN' in log_methods:
-            add_screen_logging(logger, log_name, settings)
+            add_screen_logging(logger, settings)
 
         if 'SYSLOG' in log_methods:# and ('SysLogHandler' in dir(logging)):
             add_syslog_logging(logger, log_name, settings)
@@ -55,7 +55,7 @@ def configure_logger(logger, log_name, settings={}, application_name=None, force
         logger.handlers_added = True
 
 
-def add_screen_logging(logger, log_name, settings={}):
+def add_screen_logging(logger, settings={}):
     screen_format = settings.get('SCREEN_FORMAT', '%(levelname)s\t| %(message)s')
     write_to_screen_handler = logging.StreamHandler()
     screen_formatter = logging.Formatter(screen_format, '%Y-%m-%dT%H:%M:%S')
@@ -115,10 +115,19 @@ def add_file_logging(logger, log_name, application_name, settings={}):
             print("Impossible to log with FILE handler to %s either, abandoning file logging." % log_folder)
             return
 
-    file_format = settings.get('FILE_FORMAT', '[%(asctime)s] [%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)s - %(message)s')
+    file_format = settings.get('FILE_FORMAT', None)
+
     log_file = os.path.join(log_folder, log_name + ".txt")
+
+    add_logging_file_handler(logger, log_file, file_format)
+
+
+def add_logging_file_handler(logger, log_file, format=None):
+    if not format:
+        format = '[%(asctime)s] [%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)s - %(message)s'
+
     write_to_file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=10000000, backupCount=10)
-    file_formatter = logging.Formatter(file_format, '%Y-%m-%dT%H:%M:%S')
+    file_formatter = logging.Formatter(format, '%Y-%m-%dT%H:%M:%S')
     write_to_file_handler.setFormatter(file_formatter)
     logger.addHandler(write_to_file_handler)
 

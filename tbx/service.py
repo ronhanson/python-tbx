@@ -23,6 +23,7 @@
     tbx.service.launch_service(MyService, arg="Ronan")
 
 """
+import os
 import logging
 import time
 import argparse
@@ -36,7 +37,7 @@ class Service:
     def __init__(self, **kwargs):
         self.loop_duration = kwargs.pop('loop_duration', 1.0)
 
-        logging.debug("Created service %s" % self.service_name)
+        logging.debug("Created service %s (PID %d)" % (self.service_name, os.getpid()))
         for k in kwargs:
             setattr(self, k, kwargs[k])
         self.setup()
@@ -81,7 +82,7 @@ class Service:
                 logging.warning("Keyboard Interrupt during loop, stopping %s service now..." % self.service_name)
                 break
             except Exception as e:
-                logging.exception("Error in main loop! (%s)" % e)
+                logging.exception("Error in %s main loop! (%s)" % (self.service_name, e))
                 raise e
         return res  # returns last result
 

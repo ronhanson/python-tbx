@@ -54,3 +54,4 @@
 2016-10-21	--	v1.5.0	-- Mongo handler added. New call_repeatedly function.
 2016-10-28	--	v1.6.0	-- Added web file download shortcuts
 2016-12-23	--	v1.6.1	-- Small addons
+2017-05-31	--	v1.6.2	-- Some added features and some more usability on logging
