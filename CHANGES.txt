@@ -55,3 +55,4 @@
 2016-10-28	--	v1.6.0	-- Added web file download shortcuts
 2016-12-23	--	v1.6.1	-- Small addons
 2017-05-31	--	v1.6.2	-- Some added features and some more usability on logging
+2017-06-09	--	v1.6.3	-- Fix in classifier
