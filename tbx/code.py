@@ -42,6 +42,10 @@ def static_singleton(*args, **kwargs):
     return __static_singleton_wrapper
 
 
+def import_from_name(module_name):
+    globals()[module_name] = __import__(module_name)
+
+
 class AttributeDict(dict):
     #__getattr__ = dict.__getitem__
     #__setattr__ = dict.__setitem__  #Not using this method as setattr dont work at runtime...

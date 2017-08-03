@@ -132,6 +132,7 @@ def add_logging_file_handler(logger, log_file, format=None):
     logger.addHandler(write_to_file_handler)
 
 
+
 def add_mongo_logging(logger, log_name, application_name, settings={}):
     (script_folder, app_name) = code.get_app_name()
     if not application_name:
@@ -143,6 +144,18 @@ def add_mongo_logging(logger, log_name, application_name, settings={}):
         print("Impossible to log with MONGO handler as log4mongo library is not available.")
         return
 
+    class MyMongoFormatter(log4mongo.handlers.MongoFormatter):
+        def format(self, record):
+            document = super(MyMongoFormatter, self).format(record)
+            del document['threadName']
+            del document['thread']
+            del document['loggerName']
+            del document['module']
+            del document['method']
+            document['log_name'] = log_name
+            document['hostname'] = socket.gethostname()
+            return document
+
     mongo_handler_class = log4mongo.handlers.MongoHandler
     mongo_handler_args = {
         'host': settings.get('LOGGING_MONGO_HOST', "localhost"),
@@ -152,6 +165,7 @@ def add_mongo_logging(logger, log_name, application_name, settings={}):
         'capped': settings.get('LOGGING_MONGO_CAPPED', True),
         'capped_max': settings.get('LOGGING_MONGO_CAPPED_MAX', 100000),
         'capped_size': settings.get('LOGGING_MONGO_CAPPED_SIZE', 10000000),
+        'formatter' : MyMongoFormatter()
     }
     if settings.get('LOGGING_MONGO_BUFFER_SIZE', False):
         mongo_handler_class = log4mongo.handlers.BufferedMongoHandler
@@ -161,14 +175,13 @@ def add_mongo_logging(logger, log_name, application_name, settings={}):
             'buffer_periodical_flush_timing': settings.get('LOGGING_MONGO_BUFFER_FLUSH_TIMER', 5.0)
         })
 
-    class MongoFilter(logging.Filter):
-        def filter(self, record):
-            record.application = application_name
-            record.log_name = log_name
-            record.hostname = socket.gethostname()
-            return True
-
-    logger.addFilter(MongoFilter())
+    #class MongoFilter(logging.Filter):
+    #    def filter(self, record):
+    #        record.log_name = log_name
+    #        record.hostname = socket.gethostname()
+    #        return True
+    #
+    #logger.addFilter(MongoFilter())
 
     log4mongo_handler = mongo_handler_class(**mongo_handler_args)
 
