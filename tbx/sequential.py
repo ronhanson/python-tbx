@@ -63,7 +63,7 @@ class SequentialCandidate(code_utils.SerializableObject):
                 self.first = int(column[0])
                 self.last = int(column[-1])
                 self.composite += '[' + str(column[0]) + '-' + str(column[-1]) + ']'
-                self.ffmpeg_composite += "%%0.%sd" % str(len(str(column[-1])))
+                self.ffmpeg_composite += "%%%sd" % str(len(str(column[-1])))
             else:
                 if len(list(set(column))) == 1:
                     self.composite += str(column[0])
