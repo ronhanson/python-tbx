@@ -52,7 +52,7 @@ def slugify(text, delim='-'):
 
 
 def slugify_bytes(b):
-    return base64.urlsafe_b64encode(b).decode('utf-8').strip('=')
+    return base64.urlsafe_b64encode(b).decode('utf-8').strip('=').replace('-', '0').replace('_', 'A')
 
 
 def uuid_to_slug(uuid):
@@ -192,9 +192,19 @@ mime_rendering_dict = {
     'text/plain': render_txt
 }
 
-
 def render_dict_from_mimetype(d, mimetype):
     return mime_rendering_dict.get(mimetype, render_json)(d)
+
+mime_shortcuts = {
+    'html': 'text/html',
+    'xml': 'application/xml',
+    'json': 'application/json',
+    'text': 'text/plain',
+    'txt': 'text/plain'
+}
+
+def render_dict_from_format(d, format):
+    return custom_rendering_dict.get(mime_shortcuts.get(format, 'json'))(d)
 
 
 def pretty_render(data, format='text', indent=0):
