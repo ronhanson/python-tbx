@@ -6,6 +6,7 @@
 FTP utils
 :author: Ronan Delacroix
 """
+import sys
 try:
     import logging
     import pyftpdlib.servers
@@ -171,7 +172,7 @@ try:
                              max_connection_per_ip=max_connection_per_ip)
 
 except ImportError:
-    pass
+    print("Impossible to import FTP Server helpers from tbx.ftp module. Requires pyftpdlib.", file=sys.stderr)
 
 try:
     """
@@ -203,4 +204,4 @@ try:
         """
 
 except ImportError:
-    pass
+    print("Impossible to import FTP helpers from tbx.ftp module. Requires ftplib.", file=sys.stderr)

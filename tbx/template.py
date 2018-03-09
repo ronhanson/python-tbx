@@ -11,6 +11,7 @@ import jinja2
 from functools import wraps
 import uuid
 
+
 def create_jinja_env(template_path):
     """
     Creates a Jinja2 environment with a specific template path.
@@ -34,10 +35,12 @@ def create_jinja_env(template_path):
     return jinja_env
 
 
-def render_template(env, filename, values={}):
+def render_template(env, filename, values=None):
     """
     Render a jinja template
     """
+    if not values:
+        values = {}
     tmpl = env.get_template(filename)
     return tmpl.render(values)
 

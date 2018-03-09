@@ -132,7 +132,6 @@ def add_logging_file_handler(logger, log_file, format=None):
     logger.addHandler(write_to_file_handler)
 
 
-
 def add_mongo_logging(logger, log_name, application_name, settings={}):
     (script_folder, app_name) = code.get_app_name()
     if not application_name:
@@ -141,7 +140,7 @@ def add_mongo_logging(logger, log_name, application_name, settings={}):
     try:
         import log4mongo.handlers
     except ImportError:
-        print("Impossible to log with MONGO handler as log4mongo library is not available.")
+        print("Impossible to log with MONGO handler as log4mongo library is not available.", file=sys.stderr)
         return
 
     class MyMongoFormatter(log4mongo.handlers.MongoFormatter):

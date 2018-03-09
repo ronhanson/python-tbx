@@ -10,13 +10,13 @@ import json
 import datetime
 
 import os
-import lxml.etree as etree
 import re
 import smtplib
 import unicodedata
 import six
 import uuid as UUID
 import base64
+import yaml
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -177,23 +177,44 @@ def str_to_bool(v):
     return str(v).lower() in ("yes", "on", "true", "y", "t", "1")
 
 
-datetime_handler = lambda obj: obj.isoformat(sep=' ') if isinstance(obj, datetime.datetime) else None
+def datetime_handler(obj):
+    return obj.isoformat(sep=' ') if isinstance(obj, datetime.datetime) else None
 
-render_xml = lambda _dict: dict_to_xml_string("xml", _dict)
-render_json = lambda _dict: json.dumps(_dict, sort_keys=False, indent=4, default=datetime_handler)
-render_html = lambda _dict: dict_to_html(_dict)
-render_txt = lambda _dict: dict_to_plaintext(_dict)
+
+def render_xml(_dict):
+    return dict_to_xml_string("xml", _dict)
+
+
+def render_json(_dict):
+    return json.dumps(_dict, sort_keys=False, indent=4, default=datetime_handler)
+
+
+def render_html(_dict):
+    return dict_to_html(_dict)
+
+
+def render_txt(_dict):
+    return dict_to_plaintext(_dict)
+
+
+def render_yaml(_dict):
+    return yaml.dump(_dict, default_flow_style=False)
+
 
 mime_rendering_dict = {
     'text/html': render_html,
     'application/html': render_html,
     'application/xml': render_xml,
     'application/json': render_json,
-    'text/plain': render_txt
+    'application/yaml': render_yaml,
+    'text/plain': render_txt,
+    'text/yaml': render_yaml
 }
+
 
 def render_dict_from_mimetype(d, mimetype):
     return mime_rendering_dict.get(mimetype, render_json)(d)
+
 
 mime_shortcuts = {
     'html': 'text/html',
@@ -203,8 +224,9 @@ mime_shortcuts = {
     'txt': 'text/plain'
 }
 
+
 def render_dict_from_format(d, format):
-    return custom_rendering_dict.get(mime_shortcuts.get(format, 'json'))(d)
+    return mime_rendering_dict.get(mime_shortcuts.get(format, 'json'))(d)
 
 
 def pretty_render(data, format='text', indent=0):
@@ -223,6 +245,7 @@ def pretty_render(data, format='text', indent=0):
 
 # DICT TO XML FUNCTION
 def _dict_to_xml_recurse(parent, dictitem):
+    import lxml.etree as etree
     if isinstance(dictitem, list):
         dictitem = {'item' : dictitem}
     if isinstance(dictitem, dict):
@@ -256,6 +279,7 @@ def dict_to_xml(xml_dict):
     """
     Converts a dictionary to an XML ElementTree Element
     """
+    import lxml.etree as etree
     root_tag = list(xml_dict.keys())[0]
     root = etree.Element(root_tag)
     _dict_to_xml_recurse(root, xml_dict[root_tag])
@@ -263,6 +287,7 @@ def dict_to_xml(xml_dict):
 
 
 def dict_to_xml_string(root_name, _dict):
+    import lxml.etree as etree
     _dict = {root_name: _dict}
     xml_root = dict_to_xml(_dict)
     return etree.tostring(xml_root, pretty_print=True, encoding="UTF-8", xml_declaration=True)
