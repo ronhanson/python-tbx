@@ -40,13 +40,13 @@ class Service:
         logging.debug("Created service %s (PID %d)" % (self.service_name, os.getpid()))
         for k in kwargs:
             setattr(self, k, kwargs[k])
-        self.setup()
+        self.setup(**kwargs)
 
     @property
     def service_name(self):
         return self.__class__.__name__.replace('Service', '')
 
-    def setup(self):
+    def setup(self, **kwargs):
         """
         Empty method. Can be overridden.
         Called at object creation.
