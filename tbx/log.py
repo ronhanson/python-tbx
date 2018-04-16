@@ -10,6 +10,7 @@ import socket
 import logging
 import logging.handlers
 from . import code
+from __future__ import print_function
 
 
 def configure_logging_to_screen(debug=False):
