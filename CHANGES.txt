@@ -64,3 +64,4 @@
 2018-03-15	--	v1.8.1	-- Small improvement on service.
 2018-04-17	--	v1.8.2	-- Fix for Python 2.7
 2018-04-17	--	v1.8.3-3	-- Minor fix
+2018-04-17	--	v1.8.4	-- Updated Version
