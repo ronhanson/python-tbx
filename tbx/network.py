@@ -6,7 +6,8 @@
 Network Utils
 :author: Ronan Delacroix
 """
-
+import os
+import re
 import socket
 import logging
 
@@ -34,6 +35,37 @@ def get_local_ip_address(target):
         pass
 
     return ip_adr
+
+
+def modify_hostname(hostname, reboot_if_necessary=False):
+    from sys import platform
+    if platform == "linux" or platform == "linux2":
+        ubuntu_modify_hostname(hostname, reboot_if_necessary)
+    elif platform == "darwin":
+        ubuntu_modify_hostname(hostname, reboot_if_necessary)
+    elif platform == "win32":
+        windows_modify_hostname(hostname, reboot_if_necessary)
+
+
+def ubuntu_modify_hostname(hostname, reboot_if_necessary=False):
+    with open('/etc/hostname', 'w') as etc_hostname:
+        etc_hostname.write(hostname)
+
+    os.system('sudo hostname "%s"' % hostname)
+
+    # Read in the /etc/hosts
+    with open('/etc/hosts', 'r') as etc_hosts:
+        hosts_lines = etc_hosts.read()
+
+    new_hosts_lines = re.sub(r'127\.0\.0\.1 localhost(.*)', r'127.0.0.1 localhost '+hostname, hosts_lines)
+
+    os.system('echo "%s" | sudo tee /etc/hosts ' % new_hosts_lines)
+
+
+def windows_modify_hostname(hostname, reboot_if_necessary=False):
+    os.system('wmic computersystem where name="%COMPUTERNAME%" call rename name="{hostname}"'.format(hostname=hostname))
+    if reboot_if_necessary:  # it is necessary to reboot on windows to change hostname
+        os.system('shutdown /r /t 0')
 
 
 class SocketClient:
