@@ -38,7 +38,7 @@ def get_local_ip_address(target):
 
 
 def ensure_hostname(hostname, reboot_if_necessary=False):
-    if internal_hostname and internal_hostname!=socket.gethostname():
+    if hostname and hostname != socket.gethostname():
         modify_hostname(hostname, reboot_if_necessary)
 
 
