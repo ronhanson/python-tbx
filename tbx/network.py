@@ -37,6 +37,11 @@ def get_local_ip_address(target):
     return ip_adr
 
 
+def ensure_hostname(hostname, reboot_if_necessary=False):
+    if internal_hostname and internal_hostname!=socket.gethostname():
+        modify_hostname(hostname, reboot_if_necessary)
+
+
 def modify_hostname(hostname, reboot_if_necessary=False):
     from sys import platform
     if platform == "linux" or platform == "linux2":
