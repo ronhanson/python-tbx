@@ -42,7 +42,6 @@ def ensure_hostname(hostname, reboot_if_necessary=False):
     if platform == "win32":
         hostname = hostname.replace('.', '-').upper()
     if hostname and hostname != socket.gethostname():
-        print("%s =! %s" % (hostname, socket.gethostname()))
         modify_hostname(hostname, reboot_if_necessary)
     return hostname
 
