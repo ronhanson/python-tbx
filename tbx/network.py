@@ -66,7 +66,7 @@ def ubuntu_modify_hostname(hostname, reboot_if_necessary=False):
     with open('/etc/hosts', 'r') as etc_hosts:
         hosts_lines = etc_hosts.read()
 
-    new_hosts_lines = re.sub(r'127\.0\.0\.1 localhost(.*)', r'127.0.0.1 localhost '+hostname, hosts_lines)
+    new_hosts_lines = re.sub(r'127\.0\.0\.1 (.*)localhost (.*)', r'127.0.0.1 '+hostname+r' localhost \2', hosts_lines)
 
     os.system('echo "%s" | sudo tee /etc/hosts ' % new_hosts_lines)
 
