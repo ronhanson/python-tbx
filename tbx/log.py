@@ -18,7 +18,7 @@ def configure_logging_to_screen(debug=False):
     if debug:
         level = 'DEBUG'
     (script_folder, app_name) = code.get_app_name()
-    settings = {'LOGGING_LEVEL': level, 'LOGGING_METHODS': ['SCREEN'], 'SCREEN_FORMAT': '%(levelname)s\t| %(message)s'}
+    settings = {'LOGGING_LEVEL': level, 'LOGGING_METHODS': ['SCREEN'], 'SCREEN_FORMAT': '%(levelname)-8s| %(message)s'}
     configure_logger(logging.getLogger(), app_name, settings=settings)
 
 
@@ -57,7 +57,7 @@ def configure_logger(logger, log_name, settings={}, application_name=None, force
 
 
 def add_screen_logging(logger, settings={}):
-    screen_format = settings.get('SCREEN_FORMAT', '%(levelname)s\t| %(message)s')
+    screen_format = settings.get('SCREEN_FORMAT', '%(levelname)-8s| %(message)s')
     write_to_screen_handler = logging.StreamHandler()
     screen_formatter = logging.Formatter(screen_format, '%Y-%m-%dT%H:%M:%S')
     write_to_screen_handler.setFormatter(screen_formatter)
@@ -125,9 +125,9 @@ def add_file_logging(logger, log_name, application_name, settings={}):
 
 def add_logging_file_handler(logger, log_file, format=None):
     if not format:
-        format = '[%(asctime)s] [%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)s - %(message)s'
+        format = '[%(asctime)s] [%(filename)s:%(funcName)s:%(lineno)d]\t%(levelname)-8s - %(message)s'
 
-    write_to_file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=10000000, backupCount=10)
+    write_to_file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=10000000, backupCount=10, encoding='UTF-8')
     file_formatter = logging.Formatter(format, '%Y-%m-%dT%H:%M:%S')
     write_to_file_handler.setFormatter(file_formatter)
     logger.addHandler(write_to_file_handler)
