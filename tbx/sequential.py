@@ -6,7 +6,7 @@
 Sequential files detection lib
 :author: Ronan Delacroix & Wolfgang Whoel (cinemaslides)
 """
-
+import os
 import re
 import os.path
 import glob
@@ -119,7 +119,7 @@ class SequentialFolder(SequentialCandidate):
     def __init__(self, folder_path):
         self.folder_path = folder_path.rstrip('*').rstrip('/').rstrip('\\')
         args = glob.glob(os.path.join(self.folder_path, '*'))
-        args = [os.path.join(self.folder_path, arg) for arg in args]
+        args = [os.path.join(self.folder_path, arg) for arg in args if os.path.isfile(os.path.join(self.folder_path, arg))]
         SequentialCandidate.__init__(self, args)
         self.type = "SequentialFolder"
 
