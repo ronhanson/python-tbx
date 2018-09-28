@@ -75,3 +75,4 @@
 2018-07-25	--	v1.8.12	-- Minor fix
 2018-08-02	--	v1.8.13	-- Minor changes
 2018-08-03	--	v1.8.14	-- Fix on Sequential
+2018-09-28	--	v1.8.15	-- Added minor feature.

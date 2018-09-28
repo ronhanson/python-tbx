@@ -226,7 +226,7 @@ mime_shortcuts = {
 
 
 def render_dict_from_format(d, format):
-    return mime_rendering_dict.get(mime_shortcuts.get(format, 'json'))(d)
+    return mime_rendering_dict.get(mime_shortcuts.get(format, 'application/json'))(d)
 
 
 def pretty_render(data, format='text', indent=0):

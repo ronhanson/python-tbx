@@ -32,8 +32,8 @@ def static_singleton(*args, **kwargs):
         b2 = Bob #here b1 is the same object as b2
         Bob.says() # it will display 'yop'
     """
-    
-    def __static_singleton_wrapper(cls):        
+
+    def __static_singleton_wrapper(cls):
         if cls not in __singleton_instances:
             __singleton_instances[cls] = cls(*args, **kwargs)
 
@@ -46,6 +46,7 @@ class cached_property(object):
     """
     Method Descriptor (non-data) for building an attribute on-demand on first use.
     """
+
     def __init__(self, factory):
         """
         <factory> is called such: factory(instance) to build the attribute.
@@ -68,8 +69,8 @@ def import_from_name(module_name):
 
 
 class AttributeDict(dict):
-    #__getattr__ = dict.__getitem__
-    #__setattr__ = dict.__setitem__  #Not using this method as setattr dont work at runtime...
+    # __getattr__ = dict.__getitem__
+    # __setattr__ = dict.__setitem__  #Not using this method as setattr dont work at runtime...
 
     def __getitem__(self, attr):
         try:
@@ -127,6 +128,7 @@ class ProcessException(Exception):
        Process Exception class.
        Displays the PID of the process in its representation.
     """
+
     def __init__(self, message):
         super(ProcessException, self).__init__(message)
 
@@ -157,13 +159,13 @@ def get_method_documentation(method):
                 'optionnal'    : {
                     'param3'       : 'default_value3',
                     'param4'       : 'default_value4',
-            }, 
+            },
             'help'       : {
                 'summary'    : <string> - Summary - general description like in the comment,
                 'parameters' : {
                     'param1' : 'description',
                     'param2' : 'description',
-                }, 
+                },
                 'return'     : <string> - Can be multiline,
             }
         }
@@ -197,7 +199,7 @@ def get_method_documentation(method):
             for param in params:
                 doc['parameters'][param[0]] = param[1].strip()
 
-        regex = re.compile(r":returns:(.*)", re.MULTILINE|re.DOTALL)
+        regex = re.compile(r":returns:(.*)", re.MULTILINE | re.DOTALL)
         returns = regex.search(method.__doc__)
         if returns and returns.group(0):
             doc['return'] = returns.group(0).replace(':returns:', '').replace('\n        ', '\n').strip()
@@ -219,7 +221,10 @@ class SerializableObject(object):
     """
     Serializable object : allow to export an object as a dict or to fill an object from a dict
     """
+
     def fill(self, _dict, class_list=None):
+        if not class_list:
+            class_list = get_subclasses(SerializableObject)
         for (key, value) in _dict.items():
             if type(value) in [list, dict, set]:
                 value = self.recursive_object_check(value, class_list)
@@ -236,10 +241,11 @@ class SerializableObject(object):
                 i += 1
             return elem
         elif isinstance(elem, dict):
-            if class_list and 'type' in elem and 'uuid' in elem and elem['type'] in [_class.__name__ for _class in class_list]:
+            if class_list and 'type' in elem and 'uuid' in elem and elem['type'] in [_class.__name__ for _class in
+                                                                                     class_list]:
                 for _class in class_list:
                     if elem['type'] == _class.__name__:
-                        obj = _class().fill(elem, class_list=class_list)
+                        obj = _class.__new__(_class).fill(elem, class_list=class_list)
                         return obj
             else:
                 for (key, value) in elem.items():
@@ -248,9 +254,12 @@ class SerializableObject(object):
 
         return elem
 
+    def unserialize_sub_elements(self):
+        return self.fill(self.to_dict())
+
     def to_dict(self, dic=None):
         if not dic and dic != {}:
-            dic = self.__dict__.copy() # we copy the __dict__ otherwise all the values objects, even strings, will be still referencing "self" ones. That means changing a value in the dict will change value of object, we dont want that.
+            dic = self.__dict__.copy()  # we copy the __dict__ otherwise all the values objects, even strings, will be still referencing "self" ones. That means changing a value in the dict will change value of object, we dont want that.
         for (key, value) in dic.items():
 
             if isinstance(value, SerializableObject):
@@ -348,6 +357,7 @@ class LazyLoader:
     See here for wrapping module class : http://stackoverflow.com/questions/2447353/getattr-on-a-module
     Also does lazy loading of sub modules.
     """
+
     def __init__(self, name):
         self.__module_name = name
         self.__wrapped_module = sys.modules[self.__module_name]
@@ -357,10 +367,10 @@ class LazyLoader:
         """
         Lazy loading module
         """
-        if name.startswith('__'): #importing needs access to some private reserved __*__ functions...
+        if name.startswith('__'):  # importing needs access to some private reserved __*__ functions...
             return getattr(self.__wrapped_module, name)
 
         if not self.__submodule_imports.get(name, None):
-            self.__submodule_imports[name] = importlib.import_module('.'+name, package=self.__module_name)
+            self.__submodule_imports[name] = importlib.import_module('.' + name, package=self.__module_name)
 
         return self.__submodule_imports.get(name, None)
