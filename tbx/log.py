@@ -195,8 +195,7 @@ def add_mongo_logging(logger, log_name, application_name, settings={}):
 
     log4mongo_handler = mongo_handler_class(**mongo_handler_args)
 
-    if settings.get('LOGGING_MONGO_LEVEL', 'DEBUG'):
-        log4mongo_handler.setLevel(settings.get('LOGGING_MONGO_LEVEL'))
+    log4mongo_handler.setLevel(settings.get('LOGGING_MONGO_LEVEL', 'DEBUG'))
 
     logger.addHandler(log4mongo_handler)
 

@@ -77,3 +77,4 @@
 2018-08-03	--	v1.8.14	-- Fix on Sequential
 2018-09-28	--	v1.8.15	-- Added minor feature.
 2018-10-05	--	v1.9.0	-- Reviewed logging, logging config and levels per handler.
+2018-10-08	--	v1.9.1	-- fix mongo logging bug
