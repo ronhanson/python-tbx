@@ -17,6 +17,12 @@ import six
 import uuid as UUID
 import base64
 import yaml
+import io
+
+try:
+    import toml
+except:
+    toml = None
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -148,7 +154,7 @@ def hms_to_seconds(time_string):
     secs = float(s[2])
     return hours * 3600 + minutes * 60 + secs
 
-    
+
 def seconds_to_hms_verbose(t):
     """
     Converts seconds float to 'H hours 8 minutes, 30 seconds' format
@@ -157,9 +163,9 @@ def seconds_to_hms_verbose(t):
     mins = int((t / 60) % 60)
     secs = int(t % 60)
     return ' '.join([
-        (hours + ' hour'+('s' if hours > 1 else '')) if hours > 0 else '',
-        (mins + ' minute'+('s' if mins > 1 else '')) if mins > 0 else '',
-        (secs + ' second'+('s' if secs > 1 else '')) if secs > 0 else ''
+        (hours + ' hour' + ('s' if hours > 1 else '')) if hours > 0 else '',
+        (mins + ' minute' + ('s' if mins > 1 else '')) if mins > 0 else '',
+        (secs + ' second' + ('s' if secs > 1 else '')) if secs > 0 else ''
     ])
 
 
@@ -201,6 +207,24 @@ def render_yaml(_dict):
     return yaml.dump(_dict, default_flow_style=False)
 
 
+def render_toml(_dict):
+    if toml:
+        return toml.dumps(_dict)
+    import logging
+    logging.warning("TOML Serialisation is unavailable as toml package is not installed.")
+    return render_yaml(_dict)
+
+
+def render_ini(_dict):
+    import configparser
+    s = io.StringIO()
+    p = configparser.ConfigParser()
+    p.read_dict(_dict)
+    p.write(s)
+    s.close()
+    return s.getvalue()
+
+
 mime_rendering_dict = {
     'text/html': render_html,
     'application/html': render_html,
@@ -208,7 +232,9 @@ mime_rendering_dict = {
     'application/json': render_json,
     'application/yaml': render_yaml,
     'text/plain': render_txt,
-    'text/yaml': render_yaml
+    'text/yaml': render_yaml,
+    'text/toml': render_toml,
+    'text/ini': render_ini
 }
 
 
@@ -221,7 +247,12 @@ mime_shortcuts = {
     'xml': 'application/xml',
     'json': 'application/json',
     'text': 'text/plain',
-    'txt': 'text/plain'
+    'txt': 'text/plain',
+    'yaml': 'text/yaml',
+    'yml': 'text/yaml',
+    'tml': 'text/toml',
+    'toml': 'text/toml',
+    'ini': 'text/ini'
 }
 
 
@@ -247,7 +278,7 @@ def pretty_render(data, format='text', indent=0):
 def _dict_to_xml_recurse(parent, dictitem):
     import lxml.etree as etree
     if isinstance(dictitem, list):
-        dictitem = {'item' : dictitem}
+        dictitem = {'item': dictitem}
     if isinstance(dictitem, dict):
         for (tag, child) in dictitem.items():
             if str(tag) == '_text':
@@ -258,7 +289,8 @@ def _dict_to_xml_recurse(parent, dictitem):
                     elem = etree.Element(tag)
                     parent.append(elem)
                     _dict_to_xml_recurse(elem, listchild)
-            elif len(tag)==36 and tag[8]=='-' and tag[13]=='-': #if uuid is name of the element we try to cook up something nice to display in xml
+            elif len(tag) == 36 and tag[8] == '-' and tag[
+                13] == '-':  # if uuid is name of the element we try to cook up something nice to display in xml
                 uuid = tag
                 tag = parent.tag.replace('_list', '').replace('_dict', '')
                 elem = etree.Element(tag, uuid=uuid)
@@ -301,19 +333,19 @@ def dict_to_plaintext(_dict, indent=0, result=''):
             result += '\t' * indent + "<empty>\n"
         for value in _dict:
             i += 1
-            if isinstance(value, dict) :
-                result += '\t' * indent + "["+str(i)+"]={DICT}\n" + dict_to_plaintext(value, indent+1)
-            elif isinstance(value, list) :
-                result += '\t' * indent + "["+str(i)+"]=<LIST>\n" + dict_to_plaintext(value, indent+1) + "\n"
+            if isinstance(value, dict):
+                result += '\t' * indent + "[" + str(i) + "]={DICT}\n" + dict_to_plaintext(value, indent + 1)
+            elif isinstance(value, list):
+                result += '\t' * indent + "[" + str(i) + "]=<LIST>\n" + dict_to_plaintext(value, indent + 1) + "\n"
             else:
-                result += '\t' * indent + "["+str(i)+"]=\"" + str(value) + "\"\n"
+                result += '\t' * indent + "[" + str(i) + "]=\"" + str(value) + "\"\n"
         return result
     elif isinstance(_dict, dict):
         for key, value in _dict.items():
             if isinstance(value, dict):
-                result += '\t' * indent + "{" + str(key) + "}\n" + dict_to_plaintext(value, indent+1)
+                result += '\t' * indent + "{" + str(key) + "}\n" + dict_to_plaintext(value, indent + 1)
             elif isinstance(value, list):
-                result += '\t' * indent + "<" + str(key) + '>\n' + dict_to_plaintext(value, indent+1)
+                result += '\t' * indent + "<" + str(key) + '>\n' + dict_to_plaintext(value, indent + 1)
             else:
                 if "\n" in str(value):
                     value = ' '.join([line.strip() for line in str(value).replace("\"", "'").split("\n")])
@@ -331,27 +363,33 @@ def _dict_to_html_recurse(_dict, indent=0, result=''):
         for value in _dict:
             i += 1
             if isinstance(value, dict):
-                result += '    ' * (indent+1) + "<li class='row"+str(i % 2)+"'>\n" + _dict_to_html_recurse(value, indent + 2) + '    ' * (indent + 1) + "</li>\n"
+                result += '    ' * (indent + 1) + "<li class='row" + str(i % 2) + "'>\n" + _dict_to_html_recurse(value,
+                                                                                                                 indent + 2) + '    ' * (
+                indent + 1) + "</li>\n"
             elif isinstance(value, list):
-                result += '    ' * (indent+1) + "<li class='row"+str(i % 2)+"'>\n" + _dict_to_html_recurse(value, indent + 2) + '    ' * (indent + 1) + "</li>\n"
+                result += '    ' * (indent + 1) + "<li class='row" + str(i % 2) + "'>\n" + _dict_to_html_recurse(value,
+                                                                                                                 indent + 2) + '    ' * (
+                indent + 1) + "</li>\n"
             else:
-                result += '    ' * (indent+1) + "<li class='row"+str(i % 2)+"'><pre>" + html.escape(str(value)) + "</pre></li>\n"
+                result += '    ' * (indent + 1) + "<li class='row" + str(i % 2) + "'><pre>" + html.escape(
+                    str(value)) + "</pre></li>\n"
         result += '    ' * indent + "</ul>\n"
         return result
     elif isinstance(_dict, dict):
         result += '    ' * indent + "<table>\n"
-        i=0
+        i = 0
         for key, value in _dict.items():
-            i+=1
+            i += 1
             if isinstance(value, dict) or isinstance(value, list):
-                result += '    ' * (indent + 1) + "<tr class='row"+str(i % 2)+"'>\n"
+                result += '    ' * (indent + 1) + "<tr class='row" + str(i % 2) + "'>\n"
                 result += '    ' * (indent + 2) + "<td>" + str(key) + "</td>\n"
-                result += '    ' * (indent + 2) + "<td>\n" + _dict_to_html_recurse(value, indent+3)
+                result += '    ' * (indent + 2) + "<td>\n" + _dict_to_html_recurse(value, indent + 3)
                 result += '    ' * (indent + 2) + "</td>\n"
                 result += '    ' * (indent + 1) + "</tr>\n"
             else:
                 value = html.escape(str(value))
-                result += '    ' * (indent + 1) + "<tr class='row"+str(i % 2)+"'><td>" + str(key) + "</td><td><pre>" + str(value) + "</pre></td></tr>\n"
+                result += '    ' * (indent + 1) + "<tr class='row" + str(i % 2) + "'><td>" + str(
+                    key) + "</td><td><pre>" + str(value) + "</pre></td></tr>\n"
         result += '    ' * indent + "</table>\n"
         return result
     else:
@@ -372,7 +410,7 @@ def dict_to_html(_dict, title="Result"):
             .row0 { background-color:#EAEAFF; }
             .row1 { background-color:#FFFFFF; }
         </style>
-        <title>"""+title+"""</title>
+        <title>""" + title + """</title>
     </head>
     <body>
 """ + _dict_to_html_recurse(_dict, 2) + "    </body>\n</html>"
@@ -381,26 +419,30 @@ def dict_to_html(_dict, title="Result"):
 def test_page(title="Result"):
     result = "<table>"
     docu = {}
-    i=0
+    i = 0
     for func_name, doc in docu.items():
         result += "<tr class='row" + str(i) + "'><td>" + doc['friendly_name'] + "</td>"
         if 'parameters' in doc:
-            result += "<td><form action='" + func_name + "' method='"+doc['method_type']+"' enctype='multipart/form-data'>"
+            result += "<td><form action='" + func_name + "' method='" + doc[
+                'method_type'] + "' enctype='multipart/form-data'>"
             result += "<table width='100%'>"
             if 'required' in doc['parameters']:
                 result += "<tr><th colspan='2'>Required</th></tr>"
                 for param in doc['parameters']['required']:
                     if param == 'asset_file':
-                        result += "<tr><td>" + str(param) + "</td><td><input type='file' name='" + str(param) + "' value=''/></td><tr/>"
+                        result += "<tr><td>" + str(param) + "</td><td><input type='file' name='" + str(
+                            param) + "' value=''/></td><tr/>"
                     else:
-                        result += "<tr><td>" + str(param) + "</td><td><input type='text' name='" + str(param) + "' value=''/></td><tr/>"
+                        result += "<tr><td>" + str(param) + "</td><td><input type='text' name='" + str(
+                            param) + "' value=''/></td><tr/>"
 
             if 'optionnal' in doc['parameters']:
                 result += "<tr><th colspan='2'>Optionnal</th></tr>"
                 for param, value in doc['parameters']['optionnal'].items():
-                    if value==None:
-                        value=''
-                    result += "<tr><td>" + str(param) + "</td><td><input type='text' name='" + str(param) + "' value='" + str(value) + "'/></td><tr/>"
+                    if value == None:
+                        value = ''
+                    result += "<tr><td>" + str(param) + "</td><td><input type='text' name='" + str(
+                        param) + "' value='" + str(value) + "'/></td><tr/>"
             result += "<tr><th colspan='2'><input type='submit'/></th></tr>"
             result += "</table>"
             result += "</form></td>"
@@ -408,7 +450,7 @@ def test_page(title="Result"):
             result += "<td><a href='" + func_name + "'>" + func_name + "</a></td>"
         result += "</tr>"
         i += 1
-        i = i%2
+        i = i % 2
 
     result += "</table>"
     return """
@@ -424,7 +466,7 @@ def test_page(title="Result"):
             .row0 {background-color:#EAEAFF;}
             .row1 {background-color:#FFFFFF;}
         </style>
-        <title>"""+title+"""</title>
+        <title>""" + title + """</title>
     </head>
     <body>
 """ + result + """
@@ -465,9 +507,9 @@ def xml_get_tag(xml, tag, parent_tag=None, multi_line=False):
     Returns the tag data for the first instance of the named tag, or for all instances if multi is true.
     If a parent tag is specified, then that will be required before the tag.
     """
-    expr_str = '[<:]'+tag+'.*?>(?P<matched_text>.+?)<'
+    expr_str = '[<:]' + tag + '.*?>(?P<matched_text>.+?)<'
     if parent_tag:
-        expr_str = '[<:]'+parent_tag+'.*?>.*?' + expr_str
+        expr_str = '[<:]' + parent_tag + '.*?>.*?' + expr_str
     expr = re.compile(expr_str, re.DOTALL | re.IGNORECASE)
     if multi_line:
         return expr.findall(xml)
