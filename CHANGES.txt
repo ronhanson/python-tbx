@@ -79,3 +79,4 @@
 2018-10-05	--	v1.9.0	-- Reviewed logging, logging config and levels per handler.
 2018-10-08	--	v1.9.1	-- fix mongo logging bug
 2018-10-16	--	v1.9.2	-- Added yaml, toml and ini support to serialisation
+2018-12-03	--	v1.9.3	-- Fix on logging

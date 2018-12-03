@@ -63,7 +63,7 @@ def add_screen_logging(logger, settings={}):
     screen_formatter = logging.Formatter(screen_format, '%Y-%m-%dT%H:%M:%S')
     write_to_screen_handler.setFormatter(screen_formatter)
     if level:
-        write_to_screen_handler.level = level
+        write_to_screen_handler.setLevel(level)
     logger.addHandler(write_to_screen_handler)
 
 
@@ -81,7 +81,7 @@ def add_syslog_logging(logger, log_name, settings={}):
     syslog_formatter = logging.Formatter(syslog_format, '%Y-%m-%dT%H:%M:%S')
     write_to_syslog_handler.setFormatter(syslog_formatter)
     if level:
-        syslog_formatter.level = level
+        write_to_syslog_handler.setLevel(level)
     logger.addHandler(write_to_syslog_handler)
 
 
@@ -139,7 +139,7 @@ def add_logging_file_handler(logger, log_file, format=None, level=None):
     file_formatter = logging.Formatter(format, '%Y-%m-%dT%H:%M:%S')
     write_to_file_handler.setFormatter(file_formatter)
     if level:
-        write_to_file_handler.level = level
+        write_to_file_handler.setLevel(level)
     logger.addHandler(write_to_file_handler)
 
 
