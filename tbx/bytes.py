@@ -177,6 +177,27 @@ def ip_to_bytes(ip_str, big_endian=True):
     return bytes(struct.unpack(code, socket.inet_aton(ip_str))[0])
 
 
+def bool_to_bytes(val):
+    """
+    Encode boolean to a 1 byte array
+    :param val: boolean value
+    :return: a bytes object
+    """
+    if bool(val):
+        return b'\x01'
+    else:
+        return b'\x00'
+
+
+def bytes_to_bool(byte_array):
+    """
+    Encode boolean to a 1 byte array
+    :param val: boolean value
+    :return: a bytes object
+    """
+    return bool(int(byte_array[0]))
+
+
 def decode_ber(ber):
     """
     Decodes a ber length byte array into an integer

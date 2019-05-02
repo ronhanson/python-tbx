@@ -171,7 +171,7 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
         if line_function:
             o = text_utils.uni(logfile_reader.readline()).rstrip()
             while o != '':
-                line_function(o)
+                line_function(text_utils.handle_carriage_return(o))
                 o = text_utils.uni(logfile_reader.readline()).rstrip()
 
     if not return_output:
@@ -180,7 +180,7 @@ def execute(command, return_output=True, log_file=None, log_settings=None, error
 
     logfile_reader.seek(logfile_start_position, os.SEEK_SET) #back to the beginning of the file
 
-    res = text_utils.uni(logfile_reader.read())
+    res = text_utils.handle_carriage_return(text_utils.uni(logfile_reader.read()))
 
     try:
         logfile_reader.close()

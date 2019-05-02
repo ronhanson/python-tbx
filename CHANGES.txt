@@ -80,3 +80,4 @@
 2018-10-08	--	v1.9.1	-- fix mongo logging bug
 2018-10-16	--	v1.9.2	-- Added yaml, toml and ini support to serialisation
 2018-12-03	--	v1.9.3	-- Fix on logging
+2019-05-02	--	v1.9.4	-- Added bool to/from bytes functions. Added toml serialization features. Bugfix on some process corner case.

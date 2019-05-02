@@ -231,6 +231,7 @@ mime_rendering_dict = {
     'application/xml': render_xml,
     'application/json': render_json,
     'application/yaml': render_yaml,
+    'application/toml': render_toml,
     'text/plain': render_txt,
     'text/yaml': render_yaml,
     'text/toml': render_toml,
@@ -500,6 +501,14 @@ def uni(text):
         else:
             break
     return unitext
+
+
+def handle_carriage_return(s:str):
+    if '\r' in s:
+        i = s.rfind('\r')
+        if i>0:
+            return s[i:]
+    return s
 
 
 def xml_get_tag(xml, tag, parent_tag=None, multi_line=False):
